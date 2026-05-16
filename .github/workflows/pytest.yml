@@ -21,7 +21,17 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          
+          # Install core testing tools
           pip install pytest pytest-asyncio homeassistant pytest-homeassistant-custom-component
+          
+          # MAGIC TRICK: Find the manifest.json, extract its requirements, and install them automatically!
+          if ls custom_components/*/manifest.json 1> /dev/null 2>&1; then
+            jq -r '.requirements[]?' custom_components/*/manifest.json | xargs -r pip install
+          fi
+          
+          # Also install requirements.txt if you ever use one
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run Pytest
         run: |
