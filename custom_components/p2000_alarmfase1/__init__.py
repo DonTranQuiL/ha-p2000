@@ -1,4 +1,5 @@
 """The P2000 Scraper (alarmfase1.nl) integration."""
+
 import logging
 import os
 from datetime import timedelta
@@ -8,11 +9,18 @@ from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import Alarmfase1ApiClient
-from .const import DOMAIN, CONF_REGION_PATH, PLATFORMS, DEFAULT_SCAN_INTERVAL, CONF_SCAN_INTERVAL
+from .const import (
+    DOMAIN,
+    CONF_REGION_PATH,
+    PLATFORMS,
+    DEFAULT_SCAN_INTERVAL,
+    CONF_SCAN_INTERVAL,
+)
 from .coordinator import Alarmfase1DataUpdateCoordinator
 from .cache import PersistentCache
 
 _LOGGER = logging.getLogger(__name__)
+
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up P2000 Scraper from a config entry."""
@@ -36,16 +44,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         region_path=region_path,
         update_interval=timedelta(seconds=scan_interval_seconds),
         cache=cache,
-        initial_data=initial_data
+        initial_data=initial_data,
     )
 
-    # Store the config entry in the coordinator 
+    # Store the config entry in the coordinator
     coordinator.config_entry = entry
 
     # --- NEW: L1 Persistence Boot Logic ---
     if initial_data:
         coordinator.async_set_updated_data(initial_data)
-        _LOGGER.info("P2000 [%s] initialized instantly from persistent cache", entry.title)
+        _LOGGER.info(
+            "P2000 [%s] initialized instantly from persistent cache", entry.title
+        )
     else:
         # Fetch initial data if no cache exists
         await coordinator.async_config_entry_first_refresh()
@@ -79,6 +89,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     return True
 
+
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     _LOGGER.debug("Unloading P2000 Scraper entry: %s", entry.entry_id)
@@ -90,7 +101,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     return unload_ok
 
+
 async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Handle options update."""
-    _LOGGER.debug("Reloading P2000 Scraper entry due to options update: %s", entry.entry_id)
+    _LOGGER.debug(
+        "Reloading P2000 Scraper entry due to options update: %s", entry.entry_id
+    )
     await hass.config_entries.async_reload(entry.entry_id)

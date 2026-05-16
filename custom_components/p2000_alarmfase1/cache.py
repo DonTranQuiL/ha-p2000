@@ -1,5 +1,6 @@
 from homeassistant.helpers.storage import Store
 
+
 class PersistentCache:
     """Simple storage for last known P2000 data."""
 

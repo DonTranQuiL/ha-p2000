@@ -1,26 +1,33 @@
 """API Client for scraping P2000 messages from alarmfase1.nl."""
-import asyncio
+
 import logging
-import socket
 import os
 from datetime import datetime
 
 import async_timeout
-from aiohttp import ClientError, ClientSession
+from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 
 from .const import BASE_URL, API_TIMEOUT, DEFAULT_SERVICE_TYPE
 
 _LOGGER = logging.getLogger(__name__)
 
-class ScraperApiError(Exception): 
+
+class ScraperApiError(Exception):
     pass
-class ScraperApiConnectionError(ScraperApiError): 
+
+
+class ScraperApiConnectionError(ScraperApiError):
     pass
-class ScraperApiParsingError(ScraperApiError): 
+
+
+class ScraperApiParsingError(ScraperApiError):
     pass
-class ScraperApiNoDataError(ScraperApiError): 
+
+
+class ScraperApiNoDataError(ScraperApiError):
     pass
+
 
 class Alarmfase1ApiClient:
     """Scraper API Client."""
@@ -33,12 +40,14 @@ class Alarmfase1ApiClient:
     async def async_scrape_data(self, region_path: str) -> dict | None:
         url = f"{self._base_url}{region_path.strip('/')}/"
         headers = {"User-Agent": "HomeAssistant P2000_Alarmfase1 Integration"}
-        
+
         try:
             async with async_timeout.timeout(API_TIMEOUT):
                 response = await self._session.get(url, headers=headers)
                 if response.status == 404:
-                    raise ScraperApiNoDataError(f"Invalid region path (404): {region_path}")
+                    raise ScraperApiNoDataError(
+                        f"Invalid region path (404): {region_path}"
+                    )
                 response.raise_for_status()
                 html_content = await response.text()
 
@@ -53,10 +62,12 @@ class Alarmfase1ApiClient:
             raise ScraperApiConnectionError(f"Connection error with {url}") from exc
 
         try:
-            soup = BeautifulSoup(html_content, 'lxml')
-            
+            soup = BeautifulSoup(html_content, "lxml")
+
             # Find the latest call block
-            latest_call_div = soup.select_one("#calls .call") or soup.find("div", class_="call")
+            latest_call_div = soup.select_one("#calls .call") or soup.find(
+                "div", class_="call"
+            )
             if not latest_call_div:
                 return None
 
@@ -64,7 +75,9 @@ class Alarmfase1ApiClient:
 
             # 1. Main Title (Your original code used this for 'priority_code')
             title_tag = latest_call_div.find("b", itemprop="name")
-            data["priority_code"] = title_tag.text.strip() if title_tag else "Geen titel"
+            data["priority_code"] = (
+                title_tag.text.strip() if title_tag else "Geen titel"
+            )
 
             # 2. Raw Message Text
             msg_tag = latest_call_div.find("pre")
@@ -97,18 +110,20 @@ class Alarmfase1ApiClient:
             data["city"] = city_tag.text.strip() if city_tag else "Onbekend"
 
             postal_tag = latest_call_div.find(itemprop="postalCode")
-            data["postalcode"] = postal_tag.text.strip() if postal_tag else "Geen postcode beschikbaar"
+            data["postalcode"] = (
+                postal_tag.text.strip() if postal_tag else "Geen postcode beschikbaar"
+            )
 
             street_tag = latest_call_div.find(itemprop="streetAddress")
             data["address"] = street_tag.text.strip() if street_tag else "Onbekend"
 
             # 5. Coordinates
             try:
-                data["latitude"] = float(latest_call_div.get('latitude'))
+                data["latitude"] = float(latest_call_div.get("latitude"))
             except (ValueError, TypeError):
                 data["latitude"] = None
             try:
-                data["longitude"] = float(latest_call_div.get('longitude'))
+                data["longitude"] = float(latest_call_div.get("longitude"))
             except (ValueError, TypeError):
                 data["longitude"] = None
 

@@ -1,4 +1,5 @@
 """Base entity for P2000 Scraper."""
+
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -9,7 +10,7 @@ from .coordinator import Alarmfase1DataUpdateCoordinator
 class Alarmfase1BaseEntity(CoordinatorEntity[Alarmfase1DataUpdateCoordinator]):
     """Base class for P2000 Scraper entities."""
 
-    _attr_has_entity_name = True # Use automatic naming based on device and entity name
+    _attr_has_entity_name = True  # Use automatic naming based on device and entity name
 
     def __init__(self, coordinator: Alarmfase1DataUpdateCoordinator) -> None:
         """Initialize the base entity."""
@@ -20,8 +21,10 @@ class Alarmfase1BaseEntity(CoordinatorEntity[Alarmfase1DataUpdateCoordinator]):
 
         # Link entities for this configured instance to one device
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, coordinator.config_entry.entry_id)}, # Use config entry ID for uniqueness
-            name=self._instance_name, # User-friendly name from config
+            identifiers={
+                (DOMAIN, coordinator.config_entry.entry_id)
+            },  # Use config entry ID for uniqueness
+            name=self._instance_name,  # User-friendly name from config
             manufacturer=MANUFACTURER,
             model=f"Region: {self._region_path}",
             entry_type=None,

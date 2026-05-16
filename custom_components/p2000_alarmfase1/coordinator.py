@@ -1,28 +1,39 @@
 """DataUpdateCoordinator for P2000 Scraper."""
+
 import logging
-from datetime import timedelta, datetime
-from homeassistant.core import HomeAssistant
+from datetime import datetime
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from .api import Alarmfase1ApiClient, ScraperApiError, ScraperApiNoDataError
-from .const import DOMAIN
+from .api import ScraperApiNoDataError
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class Alarmfase1DataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching P2000 data."""
 
-    def __init__(self, hass, name, client, region_path, update_interval, cache=None, initial_data=None):
+    def __init__(
+        self,
+        hass,
+        name,
+        client,
+        region_path,
+        update_interval,
+        cache=None,
+        initial_data=None,
+    ):
         self.client = client
         self.region_path = region_path
         self.cache = cache
-        
+
         # Prime the coordinator with cached data
         self.data = initial_data
         self.last_data = initial_data
-        
+
         self._error_count = 0
         self._last_update_error = False
-        self.last_update_success_timestamp = datetime.now().isoformat() if initial_data else None
+        self.last_update_success_timestamp = (
+            datetime.now().isoformat() if initial_data else None
+        )
 
         super().__init__(
             hass,
@@ -35,19 +46,19 @@ class Alarmfase1DataUpdateCoordinator(DataUpdateCoordinator):
         """Fetch data from alarmfase1.nl."""
         try:
             data = await self.client.async_scrape_data(self.region_path)
-            
+
             if data:
                 self.last_data = data
                 self.last_update_success_timestamp = datetime.now().isoformat()
                 self._error_count = 0
                 self._last_update_error = False
-                
+
                 # Save to disk cache
                 if self.cache:
                     await self.cache.save(data)
-                
+
                 return data
-            
+
             return self.last_data
 
         except ScraperApiNoDataError:
@@ -57,8 +68,10 @@ class Alarmfase1DataUpdateCoordinator(DataUpdateCoordinator):
         except Exception as err:
             self._error_count += 1
             self._last_update_error = True
-            _LOGGER.warning("Update failed for %s, using last known data: %s", self.region_path, err)
-            
+            _LOGGER.warning(
+                "Update failed for %s, using last known data: %s", self.region_path, err
+            )
+
             if self.last_data:
                 return self.last_data
             raise UpdateFailed(f"Error fetching P2000 data: {err}")

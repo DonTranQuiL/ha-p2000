@@ -1,8 +1,9 @@
 """Sensor platform for P2000 Scraper."""
+
 import logging
 from datetime import datetime
 
-from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE, EntityCategory
 from homeassistant.core import HomeAssistant, callback
@@ -27,6 +28,7 @@ from .entity import Alarmfase1BaseEntity
 
 _LOGGER = logging.getLogger(__name__)
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -39,10 +41,16 @@ async def async_setup_entry(
     entities = [P2000Sensor(coordinator)]
 
     # Add diagnostic sensors
-    entities.extend([
-        P2000DiagnosticSensor(coordinator, "status", "Status", "mdi:check-network-outline"),
-        P2000DiagnosticSensor(coordinator, "last_update", "Laatste Update", "mdi:clock-check-outline"),
-    ])
+    entities.extend(
+        [
+            P2000DiagnosticSensor(
+                coordinator, "status", "Status", "mdi:check-network-outline"
+            ),
+            P2000DiagnosticSensor(
+                coordinator, "last_update", "Laatste Update", "mdi:clock-check-outline"
+            ),
+        ]
+    )
 
     async_add_entities(entities)
 
@@ -56,20 +64,30 @@ class P2000Sensor(Alarmfase1BaseEntity, SensorEntity):
     def __init__(self, coordinator: Alarmfase1DataUpdateCoordinator) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
-        self._attr_unique_id = f"{coordinator.config_entry.data[CONF_INSTANCE_NAME]}_latest_message"
+        self._attr_unique_id = (
+            f"{coordinator.config_entry.data[CONF_INSTANCE_NAME]}_latest_message"
+        )
         self._previous_data: dict | None = None
         self._message_matches_filter = True
 
     @property
     def state(self) -> StateType:
         """Return the state of the sensor."""
-        data_to_use = self.coordinator.data if self._message_matches_filter else self._previous_data
+        data_to_use = (
+            self.coordinator.data
+            if self._message_matches_filter
+            else self._previous_data
+        )
         return data_to_use.get("priority_code") if data_to_use else None
 
     @property
     def extra_state_attributes(self) -> dict | None:
         """Return the state attributes."""
-        data_to_use = self.coordinator.data if self._message_matches_filter else self._previous_data
+        data_to_use = (
+            self.coordinator.data
+            if self._message_matches_filter
+            else self._previous_data
+        )
         if not data_to_use:
             return None
 
@@ -97,7 +115,11 @@ class P2000Sensor(Alarmfase1BaseEntity, SensorEntity):
     @property
     def icon(self) -> str | None:
         """Return the icon to use in the frontend based on service type."""
-        data_to_use = self.coordinator.data if self._message_matches_filter else self._previous_data
+        data_to_use = (
+            self.coordinator.data
+            if self._message_matches_filter
+            else self._previous_data
+        )
         service_type = data_to_use.get("service_type") if data_to_use else None
 
         if service_type == "Ambulance":
@@ -122,12 +144,18 @@ class P2000Sensor(Alarmfase1BaseEntity, SensorEntity):
 
         if service_type == "Ambulance" and not filters.get(CONF_FILTER_AMBULANCE, True):
             return False
-        if service_type == "Fire Department" and not filters.get(CONF_FILTER_FIRE, True):
+        if service_type == "Fire Department" and not filters.get(
+            CONF_FILTER_FIRE, True
+        ):
             return False
         if service_type == "Police" and not filters.get(CONF_FILTER_POLICE, True):
             return False
-        
-        if service_type not in ["Ambulance", "Fire Department", "Police"] and not filters.get(CONF_FILTER_OTHER, True):
+
+        if service_type not in [
+            "Ambulance",
+            "Fire Department",
+            "Police",
+        ] and not filters.get(CONF_FILTER_OTHER, True):
             return False
 
         return True
@@ -146,7 +174,7 @@ class P2000Sensor(Alarmfase1BaseEntity, SensorEntity):
 
 class P2000DiagnosticSensor(Alarmfase1BaseEntity, SensorEntity):
     """Representation of a clean P2000 Diagnostic Sensor."""
-    
+
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(
@@ -171,7 +199,7 @@ class P2000DiagnosticSensor(Alarmfase1BaseEntity, SensorEntity):
             if self.coordinator.last_update_error:
                 return f"Fout ({self.coordinator.error_count} mislukt)"
             return "OK"
-            
+
         elif self._data_key == "last_update":
             ts = self.coordinator.last_update_success_timestamp
             if ts:
@@ -185,7 +213,7 @@ class P2000DiagnosticSensor(Alarmfase1BaseEntity, SensorEntity):
                     pass
             # Fallback text just like the Weerplaza integration!
             return "Uit Cache (Wacht op timer)"
-            
+
         return None
 
     @property
