@@ -1,4 +1,5 @@
 """Diagnostics support for P2000 Scraper."""
+from datetime import datetime
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
