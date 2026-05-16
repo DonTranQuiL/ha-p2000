@@ -1,0 +1,3 @@
+update:
+  name: Force Update
+  description: Forces the integration to immediately scrape the latest P2000 data.
