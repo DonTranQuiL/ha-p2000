@@ -9,7 +9,7 @@
   "dependencies": [],
   "documentation": "https://github.com/malosaaa/ha-p2000",
   "integration_type": "service",
-  "iot_class": "web_scraping",
+  "iot_class": "cloud_polling"
   "issue_tracker": "https://github.com/malosaaa/ha-p2000/issues",
   "quality_scale": "bronze",
   "requirements": [
