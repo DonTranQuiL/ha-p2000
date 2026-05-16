@@ -13,10 +13,14 @@ from .const import BASE_URL, API_TIMEOUT, DEFAULT_SERVICE_TYPE
 
 _LOGGER = logging.getLogger(__name__)
 
-class ScraperApiError(Exception): pass
-class ScraperApiConnectionError(ScraperApiError): pass
-class ScraperApiParsingError(ScraperApiError): pass
-class ScraperApiNoDataError(ScraperApiError): pass
+class ScraperApiError(Exception): 
+    pass
+class ScraperApiConnectionError(ScraperApiError): 
+    pass
+class ScraperApiParsingError(ScraperApiError): 
+    pass
+class ScraperApiNoDataError(ScraperApiError): 
+    pass
 
 class Alarmfase1ApiClient:
     """Scraper API Client."""
