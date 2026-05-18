@@ -1,3 +1,5 @@
+<div align="center">
+  
 # P2000 Alarmfase1 Integration for Home Assistant
 
 <p align="center">
@@ -27,8 +29,13 @@
   <a href="https://github.com/astral-sh/ruff">
     <img src="https://img.shields.io/badge/code%20style-ruff-000000?style=for-the-badge" alt="Ruff">
   </a>
+  </a>
   <a href="https://codecov.io/gh/DonTranQuiL/ha-p2000">
-    <img src="https://img.shields.io/codecov/c/github/DonTranQuiL/ha-p2000?style=for-the-badge&color=5dbb0f&label=coverage" alt="Coverage">
+  <img 
+    src="https://codecov.io/gh/DonTranQuiL/ha-p2000/branch/main/graph/badge.svg"
+    alt="Coverage"
+    style="height:28px;"
+    >
   </a>
 
   <!-- Ecosystem -->
@@ -51,9 +58,13 @@
   </a>
 </p>
 
+
+
+
+
 This custom integration for Home Assistant allows you to scrape emergency messages from [alarmfase1.nl](https://www.alarmfase1.nl/) for a specific region and display them as sensors. It supports filtering by service type and provides geographical coordinates for map integration.
 <br>
-
+</div>
 
 ## Features
 * ✅ **L1-Style Persistence**: Includes a built-in cache system.
