@@ -50,9 +50,7 @@ def mock_coordinator():
     coordinator.config_entry = config_entry
     coordinator.last_update_error = None
     coordinator.error_count = 0
-    coordinator.last_update_success_timestamp = (
-        "2026-05-18T15:30:00+00:00"
-    )
+    coordinator.last_update_success_timestamp = "2026-05-18T15:30:00+00:00"
 
     coordinator.data = {
         "priority_code": "A1",
@@ -119,9 +117,7 @@ async def test_p2000_sensor_filtering(
 
         return default
 
-    mock_coordinator.config_entry.options.get.side_effect = (
-        filter_mock_get
-    )
+    mock_coordinator.config_entry.options.get.side_effect = filter_mock_get
 
     sensor._handle_coordinator_update()
 
