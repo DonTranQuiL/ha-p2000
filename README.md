@@ -12,7 +12,7 @@
 
   <a href="https://hacs.xyz/"><img src="https://img.shields.io/badge/HACS-CUSTOM-ff6e27?style=for-the-badge"></a>
   <a href="https://github.com/DonTranQuiL"><img src="https://img.shields.io/badge/MAINTAINER-%40DonTranQuiL-007ec6?style=for-the-badge"></a>
-  <a href="https://www.buymeacoffee.com/DonTranQuiL"><img src="https://img.shields.io/badge/BUY%20ME%20A%20COFFEE-DONATE-ffdd00?style=for-the-badge"></a>
+  <a href="https://ko-fi.com/DonTranQuiL"><img src="https://img.shields.io/badge/BUY%20ME%20A%20COFFEE-DONATE-ffdd00?style=for-the-badge"></a>
   <a href="https://community.home-assistant.io/"><img src="https://img.shields.io/badge/COMMUNITY-FORUM-007ec6?style=for-the-badge"></a>
   <a href="https://www.home-assistant.io/"><img src="https://img.shields.io/badge/HOME%20ASSISTANT-2024.5%2B-007ec6?style=for-the-badge"></a>
 </p>
