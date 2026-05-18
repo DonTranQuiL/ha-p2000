@@ -3,8 +3,7 @@
 import os
 import importlib
 
-
-async def test_domain_name():
+def test_domain_name():
     """Dynamically test that the DOMAIN constant matches the folder name."""
     # 1. Find the custom_components folder
     base_dir = os.path.dirname(os.path.dirname(__file__))
@@ -30,5 +29,4 @@ async def test_domain_name():
     assert const_module.DOMAIN == dynamic_domain
 
     # 6. NIEUW: Importeer ook de rest van de integratie om de coverage te boosten!
-    # Dit vertelt Pytest om de hoofdcode in te laden en te scannen op syntax fouten.
     importlib.import_module(f"custom_components.{dynamic_domain}")
