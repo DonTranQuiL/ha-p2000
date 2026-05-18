@@ -19,16 +19,27 @@ from custom_components.p2000_alarmfase1.sensor import P2000Sensor, P2000Diagnost
 def mock_coordinator():
     """Create a mock DataUpdateCoordinator filled with predictable testing data."""
     coordinator = MagicMock()
-
+    
     config_entry = MagicMock()
     config_entry.data = {CONF_INSTANCE_NAME: "P2000 Test"}
-    config_entry.options = {CONF_FILTERS: {CONF_FILTER_AMBULANCE: True}}
-
+    
+    # FIX: Explicitly add CONF_SENSORS to the options so capcode is allowed through
+    config_entry.options = {
+        CONF_FILTERS: {CONF_FILTER_AMBULANCE: True},
+        CONF_SENSORS: {
+            "capcode": True,
+            "service_type": True,
+            "message": True,
+            "latitude": True,
+            "longitude": True
+        }
+    }
+    
     coordinator.config_entry = config_entry
     coordinator.last_update_error = None
     coordinator.error_count = 0
     coordinator.last_update_success_timestamp = "2026-05-18T15:30:00+00:00"
-
+    
     coordinator.data = {
         "priority_code": "A1",
         "service_type": "Ambulance",
@@ -39,7 +50,7 @@ def mock_coordinator():
         "longitude": 6.062,
         "timestamp": datetime(2026, 5, 18, 15, 30, 0, tzinfo=dt_util.UTC),
     }
-
+    
     return coordinator
 
 
