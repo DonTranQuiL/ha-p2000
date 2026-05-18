@@ -1,11 +1,21 @@
 # P2000 Alarmfase1 Integration for Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz/)
-[![Maintained](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/DonTranQuiL/ha-p2000/commits/main)
-[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.5+-blue.svg)](https://www.home-assistant.io/)
-[![Code Checker](https://github.com/DonTranQuiL/ha-p2000/actions/workflows/codechecker.yml/badge.svg)](https://github.com/DonTranQuiL/ha-p2000/actions)
-[![HACS Validation](https://github.com/DonTranQuiL/ha-p2000/actions/workflows/hacs.yaml/badge.svg)](https://github.com/DonTranQuiL/ha-p2000/actions)
-[![GitHub Release](https://img.shields.io/github/v/release/DonTranQuiL/ha-p2000?style=flat-square)](https://github.com/DonTranQuiL/ha-p2000/releases)
+<p align="center">
+  <a href="https://github.com/DonTranQuiL/ha-p2000/releases"><img src="https://img.shields.io/github/v/release/DonTranQuiL/ha-p2000?style=for-the-badge&color=007ec6"></a>
+  <a href="https://github.com/DonTranQuiL/ha-p2000/blob/main/LICENSE"><img src="https://img.shields.io/github/license/DonTranQuiL/ha-p2000?style=for-the-badge&color=007ec6"></a>
+
+  <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/PRE--COMMIT-ENABLED-5dbb0f?style=for-the-badge"></a>
+  <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/badge/CODE%20STYLE-RUFF-000000?style=for-the-badge"></a>
+  <a href="https://github.com/DonTranQuiL/ha-p2000/actions/workflows/codechecker.yml"><img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/codechecker.yml?label=CODE%20CHECKER&style=for-the-badge&color=5dbb0f"></a>
+  <a href="https://github.com/DonTranQuiL/ha-p2000/actions/workflows/pytest.yml"><img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/pytest.yml?label=PYTHON%20TESTS&style=for-the-badge&color=5dbb0f"></a>
+  <a href="https://github.com/DonTranQuiL/ha-p2000/actions/workflows/hacs.yaml"><img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/hacs.yaml?label=VALIDATE%20HACS&style=for-the-badge&color=5dbb0f"></a>
+
+  <a href="https://hacs.xyz/"><img src="https://img.shields.io/badge/HACS-CUSTOM-ff6e27?style=for-the-badge"></a>
+  <a href="https://github.com/DonTranQuiL"><img src="https://img.shields.io/badge/MAINTAINER-%40DonTranQuiL-007ec6?style=for-the-badge"></a>
+  <a href="https://www.buymeacoffee.com/DonTranQuiL"><img src="https://img.shields.io/badge/BUY%20ME%20A%20COFFEE-DONATE-ffdd00?style=for-the-badge"></a>
+  <a href="https://community.home-assistant.io/"><img src="https://img.shields.io/badge/COMMUNITY-FORUM-007ec6?style=for-the-badge"></a>
+  <a href="https://www.home-assistant.io/"><img src="https://img.shields.io/badge/HOME%20ASSISTANT-2024.5%2B-007ec6?style=for-the-badge"></a>
+</p>
 
 
 This custom integration for Home Assistant allows you to scrape emergency messages from [alarmfase1.nl](https://www.alarmfase1.nl/) for a specific region and display them as sensors. It supports filtering by service type and provides geographical coordinates for map integration.
