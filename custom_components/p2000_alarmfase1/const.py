@@ -36,7 +36,7 @@ DEFAULT_UPDATE_INTERVAL: Final = timedelta(seconds=90)
 # Data Keys from scraping (used for sensor selection and attributes)
 # These should match the keys returned by the api.py parser
 SCRAPED_DATA_KEYS: Final[list[str]] = [
-    "priority_code",       # Main sensor state
+    "priority_code",  # Main sensor state
     "title",
     "message",
     "time",
@@ -44,7 +44,7 @@ SCRAPED_DATA_KEYS: Final[list[str]] = [
     "city",
     "address",
     "postalcode",
-    "capcode",             # <-- FIX ADDED
+    "capcode",  # <-- FIX ADDED
     "latitude",
     "longitude",
     "service_type",
@@ -62,7 +62,7 @@ DEFAULT_ENABLED_SENSORS: Final[list[str]] = [
     "city",
     "address",
     "postalcode",
-    "capcode",             # <-- FIX ADDED
+    "capcode",  # <-- FIX ADDED
     "service_type",
     "latitude",
     "longitude",
