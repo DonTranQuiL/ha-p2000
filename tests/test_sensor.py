@@ -7,13 +7,13 @@ import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 
-# Adjust the 'ha_p2000' folder name to match your exact DOMAIN folder if different
-from custom_components.ha_p2000.const import (
+# Adjust the 'p2000_alarmfase1' folder name to match your exact DOMAIN folder if different
+from custom_components.p2000_alarmfase1.const import (
     CONF_INSTANCE_NAME,
     CONF_FILTERS,
     CONF_FILTER_AMBULANCE,
 )
-from custom_components.ha_p2000.sensor import P2000Sensor, P2000DiagnosticSensor
+from custom_components.p2000_alarmfase1.sensor import P2000Sensor, P2000DiagnosticSensor
 
 
 @pytest.fixture
