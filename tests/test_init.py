@@ -4,6 +4,7 @@ import os
 import importlib
 import pkgutil
 
+
 def test_domain_name_and_load_modules():
     """Dynamically test that the DOMAIN constant matches the folder name, and load all modules for coverage."""
     # 1. Find the custom_components folder
@@ -17,7 +18,9 @@ def test_domain_name_and_load_modules():
         if os.path.isdir(os.path.join(components_dir, f))
     ]
 
-    assert len(integration_folders) == 1, "Could not find exactly one integration folder"
+    assert len(integration_folders) == 1, (
+        "Could not find exactly one integration folder"
+    )
     dynamic_domain = integration_folders[0]
     integration_path = os.path.join(components_dir, dynamic_domain)
 
