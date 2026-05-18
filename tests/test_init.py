@@ -3,6 +3,7 @@
 import os
 import importlib
 
+
 def test_domain_name():
     """Dynamically test that the DOMAIN constant matches the folder name."""
     # 1. Find the custom_components folder
