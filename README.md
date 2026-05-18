@@ -1,25 +1,55 @@
 # P2000 Alarmfase1 Integration for Home Assistant
 
 <p align="center">
-  <a href="https://github.com/DonTranQuiL/ha-p2000/releases"><img src="https://img.shields.io/github/v/release/DonTranQuiL/ha-p2000?style=for-the-badge&color=007ec6"></a>
-  <a href="https://github.com/DonTranQuiL/ha-p2000/blob/main/LICENSE"><img src="https://img.shields.io/github/license/DonTranQuiL/ha-p2000?style=for-the-badge&color=007ec6"></a>
+  <!-- Release / License -->
+  <a href="https://github.com/DonTranQuiL/ha-p2000/releases">
+    <img src="https://img.shields.io/github/v/release/DonTranQuiL/ha-p2000?style=for-the-badge&color=007ec6" alt="Latest Release">
+  </a>
+  <a href="https://github.com/DonTranQuiL/ha-p2000/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/DonTranQuiL/ha-p2000?style=for-the-badge&color=007ec6" alt="License">
+  </a>
 
-  <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/PRE--COMMIT-ENABLED-5dbb0f?style=for-the-badge"></a>
-  <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/badge/CODE%20STYLE-RUFF-000000?style=for-the-badge"></a>
-  <a href="https://github.com/DonTranQuiL/ha-p2000/actions/workflows/codechecker.yml"><img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/codechecker.yml?label=CODE%20CHECKER&style=for-the-badge&color=5dbb0f"></a>
-  <a href="https://github.com/DonTranQuiL/ha-p2000/actions/workflows/pytest.yml"><img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/pytest.yml?label=PYTHON%20TESTS&style=for-the-badge&color=5dbb0f"></a>
-  <a href="https://github.com/DonTranQuiL/ha-p2000/actions/workflows/hacs.yaml"><img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/hacs.yaml?label=VALIDATE%20HACS&style=for-the-badge&color=5dbb0f"></a>
-  
+  <!-- CI / Quality -->
+  <a href="https://github.com/DonTranQuiL/ha-p2000/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/codechecker.yml?style=for-the-badge&label=CODE%20CHECKS&color=5dbb0f" alt="Code Checks">
+  </a>
+  <a href="https://github.com/DonTranQuiL/ha-p2000/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/pytest.yml?style=for-the-badge&label=TESTS&color=5dbb0f" alt="Tests">
+  </a>
+  <a href="https://github.com/DonTranQuiL/ha-p2000/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/hacs.yaml?style=for-the-badge&label=HACS%20VALIDATION&color=5dbb0f" alt="HACS Validation">
+  </a>
 
-  <a href="https://hacs.xyz/"><img src="https://img.shields.io/badge/HACS-CUSTOM-ff6e27?style=for-the-badge"></a>
-  <a href="https://github.com/DonTranQuiL"><img src="https://img.shields.io/badge/MAINTAINER-%40DonTranQuiL-007ec6?style=for-the-badge"></a>
-  <a href="https://ko-fi.com/DonTranQuiL"><img src="https://img.shields.io/badge/BUY%20ME%20A%20COFFEE-DONATE-ffdd00?style=for-the-badge"></a>
-  <a href="https://community.home-assistant.io/"><img src="https://img.shields.io/badge/COMMUNITY-FORUM-007ec6?style=for-the-badge"></a>
-  <a href="https://www.home-assistant.io/"><img src="https://img.shields.io/badge/HOME%20ASSISTANT-2024.5%2B-007ec6?style=for-the-badge"></a>
+  <!-- Code Quality -->
+  <a href="https://github.com/pre-commit/pre-commit">
+    <img src="https://img.shields.io/badge/pre--commit-enabled-5dbb0f?style=for-the-badge" alt="pre-commit">
+  </a>
+  <a href="https://github.com/astral-sh/ruff">
+    <img src="https://img.shields.io/badge/code%20style-ruff-000000?style=for-the-badge" alt="Ruff">
+  </a>
+  <a href="https://codecov.io/gh/DonTranQuiL/ha-p2000">
+    <img src="https://img.shields.io/codecov/c/github/DonTranQuiL/ha-p2000?style=for-the-badge&color=5dbb0f&label=coverage" alt="Coverage">
+  </a>
+
+  <!-- Ecosystem -->
+  <a href="https://hacs.xyz/">
+    <img src="https://img.shields.io/badge/HACS-CUSTOM-ff6e27?style=for-the-badge" alt="HACS">
+  </a>
+  <a href="https://www.home-assistant.io/">
+    <img src="https://img.shields.io/badge/Home%20Assistant-2024.5%2B-007ec6?style=for-the-badge" alt="Home Assistant">
+  </a>
+
+  <!-- Social / Support -->
+  <a href="https://github.com/DonTranQuiL">
+    <img src="https://img.shields.io/badge/maintainer-%40DonTranQuiL-007ec6?style=for-the-badge" alt="Maintainer">
+  </a>
+  <a href="https://ko-fi.com/DonTranQuiL">
+    <img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-ffdd00?style=for-the-badge" alt="Donate">
+  </a>
+  <a href="https://community.home-assistant.io/">
+    <img src="https://img.shields.io/badge/community-forum-007ec6?style=for-the-badge" alt="Community">
+  </a>
 </p>
-
-
-<a href="https://codecov.io/gh/DonTranQuiL/ha-p2000"><img src="https://img.shields.io/codecov/c/github/DonTranQuiL/ha-p2000?style=for-the-badge&color=5dbb0f&label=COVERAGE"></a>
 
 This custom integration for Home Assistant allows you to scrape emergency messages from [alarmfase1.nl](https://www.alarmfase1.nl/) for a specific region and display them as sensors. It supports filtering by service type and provides geographical coordinates for map integration.
 <br>
