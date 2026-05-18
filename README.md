@@ -9,6 +9,7 @@
   <a href="https://github.com/DonTranQuiL/ha-p2000/actions/workflows/codechecker.yml"><img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/codechecker.yml?label=CODE%20CHECKER&style=for-the-badge&color=5dbb0f"></a>
   <a href="https://github.com/DonTranQuiL/ha-p2000/actions/workflows/pytest.yml"><img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/pytest.yml?label=PYTHON%20TESTS&style=for-the-badge&color=5dbb0f"></a>
   <a href="https://github.com/DonTranQuiL/ha-p2000/actions/workflows/hacs.yaml"><img src="https://img.shields.io/github/actions/workflow/status/DonTranQuiL/ha-p2000/hacs.yaml?label=VALIDATE%20HACS&style=for-the-badge&color=5dbb0f"></a>
+  
 
   <a href="https://hacs.xyz/"><img src="https://img.shields.io/badge/HACS-CUSTOM-ff6e27?style=for-the-badge"></a>
   <a href="https://github.com/DonTranQuiL"><img src="https://img.shields.io/badge/MAINTAINER-%40DonTranQuiL-007ec6?style=for-the-badge"></a>
@@ -17,6 +18,8 @@
   <a href="https://www.home-assistant.io/"><img src="https://img.shields.io/badge/HOME%20ASSISTANT-2024.5%2B-007ec6?style=for-the-badge"></a>
 </p>
 
+
+<a href="https://codecov.io/gh/DonTranQuiL/ha-p2000"><img src="https://img.shields.io/codecov/c/github/DonTranQuiL/ha-p2000?style=for-the-badge&color=5dbb0f&label=COVERAGE"></a>
 
 This custom integration for Home Assistant allows you to scrape emergency messages from [alarmfase1.nl](https://www.alarmfase1.nl/) for a specific region and display them as sensors. It supports filtering by service type and provides geographical coordinates for map integration.
 <br>
