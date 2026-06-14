@@ -12,9 +12,6 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/malosaaa/ha-p2000/issues",
   "quality_scale": "bronze",
-  "requirements": [
-    "beautifulsoup4>=4.12.3",
-    "lxml>=5.3.0"
-  ],
-  "version": "1.1.4"
+  "requirements": [],
+  "version": "2.0.0"
 }
