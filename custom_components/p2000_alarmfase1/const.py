@@ -12,29 +12,31 @@ MANUFACTURER: Final = "Malosaaa - alarmfase1.nl"
 
 # Configuration Keys
 CONF_REGION_PATH: Final = "region_path"
-CONF_INSTANCE_NAME: Final = "instance_name"
+CONF_INSTANCE_NAME: Final = "instance_name"  # User-defined name for the device/instance
 CONF_SENSORS: Final = "sensors"
 CONF_FILTERS: Final = "filters"
 
 CONF_FILTER_AMBULANCE: Final = "filter_ambulance"
 CONF_FILTER_FIRE: Final = "filter_fire"
 CONF_FILTER_POLICE: Final = "filter_police"
-CONF_FILTER_OTHER: Final = "filter_other"
+CONF_FILTER_OTHER: Final = "filter_other"  # KNRM, Traumaheli, etc.
 
 CONF_SCAN_INTERVAL: Final = "scan_interval"
 
-DEFAULT_SCAN_INTERVAL: Final = 120
-MIN_SCAN_INTERVAL: Final = 30
+DEFAULT_SCAN_INTERVAL: Final = 120  # seconds
+MIN_SCAN_INTERVAL: Final = 30  # seconds
 
-# --- NEW CENTRAL API DETAILS ---
-# Replace this IP with the actual IP/domain of your hosted FastAPI container
-CENTRAL_API_BASE_URL: Final = "https://p2000-api.onrender.com/api/p2000/"
-API_TIMEOUT: Final = 15
+# API Details
+BASE_URL: Final = "https://www.alarmfase1.nl/"
+API_TIMEOUT: Final = 20
 
+# Update Interval
 DEFAULT_UPDATE_INTERVAL: Final = timedelta(seconds=90)
 
+# Data Keys from scraping (used for sensor selection and attributes)
+# These should match the keys returned by the api.py parser
 SCRAPED_DATA_KEYS: Final[list[str]] = [
-    "priority_code",
+    "priority_code",  # Main sensor state
     "title",
     "message",
     "time",
@@ -42,7 +44,7 @@ SCRAPED_DATA_KEYS: Final[list[str]] = [
     "city",
     "address",
     "postalcode",
-    "capcode",
+    "capcode",  # <-- FIX ADDED
     "latitude",
     "longitude",
     "service_type",
@@ -50,6 +52,7 @@ SCRAPED_DATA_KEYS: Final[list[str]] = [
     "absolute_time_str",
 ]
 
+# Default sensor selection (enabled by default)
 DEFAULT_ENABLED_SENSORS: Final[list[str]] = [
     "priority_code",
     "title",
@@ -59,12 +62,13 @@ DEFAULT_ENABLED_SENSORS: Final[list[str]] = [
     "city",
     "address",
     "postalcode",
-    "capcode",
+    "capcode",  # <-- FIX ADDED
     "service_type",
     "latitude",
     "longitude",
 ]
 
+# Sensor configuration schema used in config flow options
 SENSOR_SCHEMA = vol.Schema(
     {
         vol.Optional(
@@ -75,6 +79,7 @@ SENSOR_SCHEMA = vol.Schema(
     }
 )
 
+# Filter configuration schema used in config flow options
 FILTER_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_FILTER_AMBULANCE, default=True): cv.boolean,
@@ -84,6 +89,7 @@ FILTER_SCHEMA = vol.Schema(
     }
 )
 
+# Mapping from icon fragments to service types
 SERVICE_TYPE_ICON_MAP: Final[dict[str, str]] = {
     "ambulance": "Ambulance",
     "fire-extinguisher": "Fire Department",
@@ -93,6 +99,7 @@ SERVICE_TYPE_ICON_MAP: Final[dict[str, str]] = {
 
 DEFAULT_SERVICE_TYPE: Final = "Other"
 
+# Diagnostics
 DIAG_CONFIG_ENTRY = "config_entry"
 DIAG_OPTIONS = "options"
 DIAG_COORDINATOR_DATA = "coordinator_data"
