@@ -12,16 +12,16 @@ from homeassistant.helpers.typing import StateType
 from homeassistant.util import dt as dt_util
 
 from .const import (
-    DOMAIN,
-    SCRAPED_DATA_KEYS,
-    CONF_SENSORS,
-    CONF_FILTERS,
     CONF_FILTER_AMBULANCE,
     CONF_FILTER_FIRE,
-    CONF_FILTER_POLICE,
     CONF_FILTER_OTHER,
+    CONF_FILTER_POLICE,
+    CONF_FILTERS,
     CONF_INSTANCE_NAME,
+    CONF_SENSORS,
     DEFAULT_ENABLED_SENSORS,
+    DOMAIN,
+    SCRAPED_DATA_KEYS,
 )
 from .coordinator import Alarmfase1DataUpdateCoordinator
 from .entity import Alarmfase1BaseEntity

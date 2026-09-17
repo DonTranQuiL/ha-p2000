@@ -6,7 +6,7 @@ from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN, DIAG_CONFIG_ENTRY, DIAG_OPTIONS, DIAG_COORDINATOR_DATA
+from .const import DIAG_CONFIG_ENTRY, DIAG_COORDINATOR_DATA, DIAG_OPTIONS, DOMAIN
 from .coordinator import Alarmfase1DataUpdateCoordinator
 
 

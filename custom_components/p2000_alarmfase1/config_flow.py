@@ -1,10 +1,9 @@
 """Config flow for P2000 Scraper."""
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -12,21 +11,21 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .api import (
     Alarmfase1ApiClient,
     ScraperApiConnectionError,
+    ScraperApiError,
     ScraperApiNoDataError,
     ScraperApiParsingError,
-    ScraperApiError,
 )
 from .const import (
-    DOMAIN,
-    CONF_REGION_PATH,
-    CONF_INSTANCE_NAME,
-    CONF_SENSORS,
     CONF_FILTERS,
-    SENSOR_SCHEMA,
-    FILTER_SCHEMA,
+    CONF_INSTANCE_NAME,
+    CONF_REGION_PATH,
     CONF_SCAN_INTERVAL,
+    CONF_SENSORS,
     DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
+    FILTER_SCHEMA,
     MIN_SCAN_INTERVAL,
+    SENSOR_SCHEMA,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -54,10 +53,10 @@ class P2000ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(
-        self, user_input: Optional[Dict[str, Any]] = None
+        self, user_input: dict[str, Any] | None = None
     ) -> config_entries.FlowResult:
         """Handle the initial step."""
-        errors: Dict[str, str] = {}
+        errors: dict[str, str] = {}
         if user_input is not None:
             # Use region_path as unique ID for config entry to prevent duplicates
             unique_id = user_input[CONF_REGION_PATH].strip("/")
@@ -116,7 +115,7 @@ class P2000OptionsFlowHandler(config_entries.OptionsFlow):
         self.options = dict(config_entry.options)
 
     async def async_step_init(
-        self, user_input: Optional[Dict[str, Any]] = None
+        self, user_input: dict[str, Any] | None = None
     ) -> config_entries.FlowResult:
         """Manage the main options step (sensor selection)."""
         if user_input is not None:
@@ -133,7 +132,7 @@ class P2000OptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(step_id="init", data_schema=schema)
 
     async def async_step_filters(
-        self, user_input: Optional[Dict[str, Any]] = None
+        self, user_input: dict[str, Any] | None = None
     ) -> config_entries.FlowResult:
         """Manage the filter selection step."""
         if user_input is not None:
@@ -148,10 +147,10 @@ class P2000OptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(step_id="filters", data_schema=schema)
 
     async def async_step_interval(
-        self, user_input: Optional[Dict[str, Any]] = None
+        self, user_input: dict[str, Any] | None = None
     ) -> config_entries.FlowResult:
         """Manage the scan interval setting."""
-        errors: Dict[str, str] = {}
+        errors: dict[str, str] = {}
         if user_input is not None:
             scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
             if not isinstance(scan_interval, int) or scan_interval < MIN_SCAN_INTERVAL:

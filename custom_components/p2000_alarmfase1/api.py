@@ -8,7 +8,7 @@ import async_timeout
 from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 
-from .const import BASE_URL, API_TIMEOUT, DEFAULT_SERVICE_TYPE
+from .const import API_TIMEOUT, BASE_URL, DEFAULT_SERVICE_TYPE
 
 _LOGGER = logging.getLogger(__name__)
 
