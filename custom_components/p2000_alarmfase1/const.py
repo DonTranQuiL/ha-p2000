@@ -1,10 +1,10 @@
 """Constants for the P2000 Scraper integration."""
 
-from typing import Final
 from datetime import timedelta
+from typing import Final
 
-import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 
 DOMAIN: Final = "p2000_alarmfase1"
 PLATFORMS: Final[list[str]] = ["sensor"]

@@ -2,7 +2,9 @@
 
 import logging
 from datetime import datetime
+
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+
 from .api import ScraperApiNoDataError
 
 _LOGGER = logging.getLogger(__name__)
