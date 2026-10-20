@@ -2,11 +2,6 @@
   "domain": "p2000_alarmfase1",
   "name": "P2000 (alarmfase1.nl)",
   "after_dependencies": [],
-  "categories": [
-    "weather_alerts.public_warnings",
-    "security_safety",
-    "local_services"
-  ],
   "codeowners": [
     "@malosaaa"
   ],
