@@ -82,7 +82,9 @@ This custom integration for Home Assistant allows you to scrape emergency messag
 * ✅ **L1-Style Persistence**: Includes a built-in cache system.
 * ✅ **Blaxing fast startup and entity control**: Assistant reboots—no more "Unknown" states on startup.
 * ✅ **Latest live data**: Fetches the latest P2000 emergency messages from alarmfase1.nl.
-* ✅ **Multiple regions**: Configure multiple regions by adding the integration multiple times.
+* ✅ **Multiple regions**: Add extra regions/towns to one instance via ⚙️ Configure (merged & de-duplicated), or add the integration multiple times.
+* ✅ **Bundled P2000 Map Card**: Animated Leaflet map with photo markers for ambulance, fire, police and trauma heli — auto-registered, no manual resource needed.
+* ✅ **Recent calls list**: `calls` attribute with the latest messages (incl. coordinates, priority, link) plus a `Meldingen` count sensor.
 * ✅ **Filter**: Filter messages by service type (Ambulance, Fire Department, Police, Other) via the Options flow.
 * ✅ **Coordinates**: Includes coordinates (latitude and longitude) for displaying incidents on a map.
 * ✅ **Diagnostics**: Provides diagnostic sensors for monitoring the integration's status.
@@ -93,9 +95,9 @@ This custom integration for Home Assistant allows you to scrape emergency messag
 
 | Service | Description |
 | :--- | :--- |
-| `p2000.manual_refresh` | Forces an immediate scrape of the website. |
-| `p2000.clear_cache` | Deletes the local `.storage` cache file. |
-| `p2000.clear_debugfile` | Deletes the local `debugfile`. |
+| `p2000_alarmfase1.manual_refresh` | Forces an immediate scrape of all regions. |
+| `p2000_alarmfase1.clear_cache` | Deletes the local `.storage` cache file. |
+| `p2000_alarmfase1.clear_debug_file` | Deletes the legacy debug file (no longer written). |
 
 ## Prerequisites
 
@@ -173,6 +175,23 @@ This integration creates the following entities for each configured region (inst
 ## Map Integration
 
 The main sensor provides `latitude` and `longitude` attributes, allowing you to display emergency incidents on a Home Assistant map card. The icon of the map marker will dynamically change based on the `service_type` of the message (e.g., ambulance icon, fire truck icon, police car icon).
+
+## 🗺️ P2000 Map Card (bundled)
+
+Since v2.1.0 the integration ships its own card and registers it automatically (refresh your browser once after updating).
+
+```yaml
+type: custom:p2000-map-card
+entity: sensor.p2000_kerkrade      # or entities: [sensor.a, sensor.b]
+title: P2000 meldingen             # optional
+height: 400                        # optional
+show_list: true                    # optional, list of latest calls under the map
+list_size: 6                       # optional
+fade_minutes: 60                   # optional, older markers fade out
+dark: auto                         # auto | true | false
+```
+
+Newest calls drop in with a flashing blue/red ring; every marker shows a photo of the service (ambulance, brandweer, politie, traumaheli). Click a marker or list item for details and a link to alarmfase1.nl. Map tiles: OpenStreetMap / CARTO, Leaflet loaded from unpkg.
 
 ## 🎨 Recommended Dashboard (Mushroom)
 
@@ -327,7 +346,9 @@ grid_options:
 
 The following options can be configured for each instance of the integration:
 
-* **Scan Interval:** How often to check for new messages (in seconds).
+* **Extra regions:** Additional region paths (e.g. `brabant-noord/gemert`, `drenthe` or a full alarmfase1.nl URL). Each one is validated before saving; the integration reloads automatically.
+* **Scan Interval:** How often to check for new messages (in seconds, min 30).
+* **Max messages / max age:** How many recent calls are kept for the map card and how old they may be.
 * **Enabled Sensors:** Select which details from the scraped message should be included as attributes of the main sensor.
 * **Filters:** Enable or disable filtering for specific service types (Ambulance, Fire Department, Police, Other).
 

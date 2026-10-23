@@ -1,11 +1,14 @@
 """Config flow for P2000 Scraper."""
 
+from __future__ import annotations
+
 import logging
 from typing import Any
 
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
+from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import (
@@ -14,13 +17,19 @@ from .api import (
     ScraperApiError,
     ScraperApiNoDataError,
     ScraperApiParsingError,
+    normalize_region_path,
 )
 from .const import (
+    CONF_EXTRA_REGIONS,
     CONF_FILTERS,
     CONF_INSTANCE_NAME,
+    CONF_MAX_AGE,
+    CONF_MAX_CALLS,
     CONF_REGION_PATH,
     CONF_SCAN_INTERVAL,
     CONF_SENSORS,
+    DEFAULT_MAX_AGE,
+    DEFAULT_MAX_CALLS,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     FILTER_SCHEMA,
@@ -30,7 +39,6 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-# Schema for user input step
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_INSTANCE_NAME): str,
@@ -40,11 +48,21 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 
 
 async def validate_input(hass, region_path: str) -> None:
-    """Validate the user input allows us to connect and parse."""
-    session = async_get_clientsession(hass)
-    client = Alarmfase1ApiClient(session)
-    # Perform a test scrape - raises exceptions on failure
-    await client.async_scrape_data(region_path)
+    """Validate that the region page can be fetched and parsed."""
+    client = Alarmfase1ApiClient(async_get_clientsession(hass))
+    await client.async_scrape_calls(region_path)
+
+
+def _error_key(exc: Exception) -> str:
+    if isinstance(exc, ScraperApiNoDataError):
+        return "invalid_region_path"
+    if isinstance(exc, ScraperApiConnectionError):
+        return "cannot_connect"
+    if isinstance(exc, ScraperApiParsingError):
+        return "parse_error"
+    if isinstance(exc, ScraperApiError):
+        return "unknown_api_error"
+    return "unknown"
 
 
 class P2000ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -52,128 +70,161 @@ class P2000ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.FlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None):
         """Handle the initial step."""
         errors: dict[str, str] = {}
         if user_input is not None:
-            # Use region_path as unique ID for config entry to prevent duplicates
-            unique_id = user_input[CONF_REGION_PATH].strip("/")
-            await self.async_set_unique_id(unique_id)
+            region = normalize_region_path(user_input[CONF_REGION_PATH])
+            await self.async_set_unique_id(region)
             self._abort_if_unique_id_configured()
-
             try:
-                _LOGGER.info(
-                    "Validating P2000 region path: %s", user_input[CONF_REGION_PATH]
+                await validate_input(self.hass, region)
+            except Exception as exc:
+                key = _error_key(exc)
+                if key == "unknown":
+                    _LOGGER.exception("Unexpected exception during validation")
+                errors[CONF_REGION_PATH if key == "invalid_region_path" else "base"] = (
+                    key
                 )
-                await validate_input(self.hass, user_input[CONF_REGION_PATH])
-            except ScraperApiConnectionError:
-                errors["base"] = "cannot_connect"
-            except ScraperApiNoDataError:
-                errors[CONF_REGION_PATH] = (
-                    "invalid_region_path"  # Specific error for 404 etc.
-                )
-            except ScraperApiParsingError:
-                errors["base"] = "parse_error"  # Website structure might have changed
-            except ScraperApiError:
-                errors["base"] = "unknown_api_error"
-            except Exception as e:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected exception during validation: %s", e)
-                errors["base"] = "unknown"
             else:
-                # Input validated, create entry with data, proceed to options flow
-                # Store user input in data, options will be set in next step
                 return self.async_create_entry(
-                    title=user_input[CONF_INSTANCE_NAME],  # Use user's name for title
-                    data=user_input,
-                    # Proceed to options flow by returning empty dict for options here
+                    title=user_input[CONF_INSTANCE_NAME],
+                    data={**user_input, CONF_REGION_PATH: region},
                     options={},
                 )
-
         return self.async_show_form(
             step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
         )
 
-    # Add Options Flow Handler for initial and subsequent configuration
     @staticmethod
     @callback
-    def async_get_options_flow(
-        config_entry: config_entries.ConfigEntry,
-    ) -> config_entries.OptionsFlow:
-        """Get the options flow for this handler."""
-        return P2000OptionsFlowHandler(config_entry)
+    def async_get_options_flow(config_entry):
+        """Get the options flow (HA provides self.config_entry itself)."""
+        return P2000OptionsFlowHandler()
 
 
 class P2000OptionsFlowHandler(config_entries.OptionsFlow):
-    """Handle an options flow for P2000 Scraper."""
+    """Options: regions + interval -> sensors -> filters.
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        """Initialize options flow."""
-        self.config_entry = config_entry
-        # Load current options or provide defaults
-        self.options = dict(config_entry.options)
+    NOTE: Do not assign self.config_entry; since HA 2025.12 that raises and
+    produced the '500 Internal Server Error' on the cogwheel.
+    """
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.FlowResult:
-        """Manage the main options step (sensor selection)."""
-        if user_input is not None:
-            # Store sensor selections from this step
-            self.options[CONF_SENSORS] = user_input
-            # Proceed to the next step (filter selection)
-            return await self.async_step_filters()
+    def __init__(self) -> None:
+        self._options: dict[str, Any] = {}
 
-        # Show form for sensor selection, pre-filled with current options
-        # Use SENSOR_SCHEMA which has defaults built-in
-        schema = self.add_suggested_values_to_schema(
-            SENSOR_SCHEMA, self.options.get(CONF_SENSORS)
-        )
-        return self.async_show_form(step_id="init", data_schema=schema)
+    def _placeholders(self) -> dict[str, str]:
+        return {
+            "instance_name": self.config_entry.title,
+            "region_path": self.config_entry.data.get(CONF_REGION_PATH, ""),
+        }
 
-    async def async_step_filters(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.FlowResult:
-        """Manage the filter selection step."""
-        if user_input is not None:
-            # Store filter selections and proceed to the scan interval step
-            self.options[CONF_FILTERS] = user_input
-            return await self.async_step_interval()
-
-        # Show form for filter selection
-        schema = self.add_suggested_values_to_schema(
-            FILTER_SCHEMA, self.options.get(CONF_FILTERS)
-        )
-        return self.async_show_form(step_id="filters", data_schema=schema)
-
-    async def async_step_interval(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.FlowResult:
-        """Manage the scan interval setting."""
+    async def async_step_init(self, user_input: dict[str, Any] | None = None):
+        """Regions and polling."""
+        if not self._options:
+            self._options = dict(self.config_entry.options)
         errors: dict[str, str] = {}
         if user_input is not None:
-            scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
-            if not isinstance(scan_interval, int) or scan_interval < MIN_SCAN_INTERVAL:
+            regions: list[str] = []
+            primary = self.config_entry.data.get(CONF_REGION_PATH)
+            for raw in user_input.get(CONF_EXTRA_REGIONS, []) or []:
+                for part in str(raw).replace(";", ",").split(","):
+                    r = normalize_region_path(part)
+                    if r and r != primary and r not in regions:
+                        regions.append(r)
+            old = set(self._options.get(CONF_EXTRA_REGIONS, []))
+            for r in regions:
+                if r in old:
+                    continue
+                try:
+                    await validate_input(self.hass, r)
+                except Exception as exc:
+                    errors[CONF_EXTRA_REGIONS] = _error_key(exc)
+                    _LOGGER.warning("Region %s rejected: %s", r, exc)
+                    break
+            interval = int(user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))
+            if interval < MIN_SCAN_INTERVAL:
                 errors[CONF_SCAN_INTERVAL] = "interval_too_short"
-            else:
-                self.options[CONF_SCAN_INTERVAL] = scan_interval
-                _LOGGER.debug(
-                    "Updating options for %s: %s",
-                    self.config_entry.entry_id,
-                    self.options,
+            if not errors:
+                self._options[CONF_EXTRA_REGIONS] = regions
+                self._options[CONF_SCAN_INTERVAL] = interval
+                self._options[CONF_MAX_CALLS] = int(
+                    user_input.get(CONF_MAX_CALLS, DEFAULT_MAX_CALLS)
                 )
-                # Create the entry with the combined options
-                return self.async_create_entry(title="", data=self.options)
+                self._options[CONF_MAX_AGE] = int(
+                    user_input.get(CONF_MAX_AGE, DEFAULT_MAX_AGE)
+                )
+                return await self.async_step_sensors()
 
-        # Show form for scan interval
+        o = self._options
         schema = vol.Schema(
             {
                 vol.Optional(
+                    CONF_EXTRA_REGIONS, default=o.get(CONF_EXTRA_REGIONS, [])
+                ): selector.TextSelector(selector.TextSelectorConfig(multiple=True)),
+                vol.Required(
                     CONF_SCAN_INTERVAL,
-                    default=self.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
-                ): int,
+                    default=o.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=MIN_SCAN_INTERVAL,
+                        max=3600,
+                        step=10,
+                        unit_of_measurement="s",
+                        mode=selector.NumberSelectorMode.BOX,
+                    )
+                ),
+                vol.Required(
+                    CONF_MAX_CALLS, default=o.get(CONF_MAX_CALLS, DEFAULT_MAX_CALLS)
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=1, max=100, mode=selector.NumberSelectorMode.BOX
+                    )
+                ),
+                vol.Required(
+                    CONF_MAX_AGE, default=o.get(CONF_MAX_AGE, DEFAULT_MAX_AGE)
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=0,
+                        max=10080,
+                        step=10,
+                        unit_of_measurement="min",
+                        mode=selector.NumberSelectorMode.BOX,
+                    )
+                ),
             }
         )
         return self.async_show_form(
-            step_id="interval", data_schema=schema, errors=errors
+            step_id="init",
+            data_schema=schema,
+            errors=errors,
+            description_placeholders=self._placeholders(),
+        )
+
+    async def async_step_sensors(self, user_input: dict[str, Any] | None = None):
+        """Attribute selection."""
+        if user_input is not None:
+            self._options[CONF_SENSORS] = user_input
+            return await self.async_step_filters()
+        schema = self.add_suggested_values_to_schema(
+            SENSOR_SCHEMA, self._options.get(CONF_SENSORS) or {}
+        )
+        return self.async_show_form(
+            step_id="sensors",
+            data_schema=schema,
+            description_placeholders=self._placeholders(),
+        )
+
+    async def async_step_filters(self, user_input: dict[str, Any] | None = None):
+        """Service filters."""
+        if user_input is not None:
+            self._options[CONF_FILTERS] = user_input
+            return self.async_create_entry(title="", data=self._options)
+        schema = self.add_suggested_values_to_schema(
+            FILTER_SCHEMA, self._options.get(CONF_FILTERS) or {}
+        )
+        return self.async_show_form(
+            step_id="filters",
+            data_schema=schema,
+            description_placeholders=self._placeholders(),
         )

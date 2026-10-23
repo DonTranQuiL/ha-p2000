@@ -1,3 +1,9 @@
-update:
-  name: Force Update
-  description: Forces the integration to immediately scrape the latest P2000 data.
+manual_refresh:
+  name: Manual refresh
+  description: Immediately scrape alarmfase1.nl for all configured P2000 regions.
+clear_cache:
+  name: Clear cache
+  description: Remove the persistent cache of the last known P2000 messages.
+clear_debug_file:
+  name: Clear debug file
+  description: Delete the legacy p2000_debug.txt file if it still exists.

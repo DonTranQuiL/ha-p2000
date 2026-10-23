@@ -1,0 +1,95 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add P2000 region (alarmfase1.nl)",
+        "description": "Enter a friendly name and the region path from alarmfase1.nl, e.g. `limburg-zuid/kerkrade` (town) or `limburg-zuid` (whole safety region). A full URL also works.",
+        "data": {
+          "instance_name": "Friendly name",
+          "region_path": "Region path"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to alarmfase1.nl.",
+      "invalid_region_path": "Region path not found on alarmfase1.nl (404). Use e.g. `limburg-zuid/kerkrade` or `brabant-noord`.",
+      "parse_error": "Failed to parse data from alarmfase1.nl. The website structure may have changed.",
+      "unknown_api_error": "An unknown error occurred while fetching data.",
+      "unknown": "An unexpected error occurred.",
+      "interval_too_short": "Scan interval must be at least 30 seconds."
+    },
+    "abort": {
+      "already_configured": "This region path is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Regions & polling for {instance_name}",
+        "description": "Main region: `{region_path}`. Add extra regions/towns to merge into this sensor (one per line, e.g. `brabant-noord/gemert` or a full alarmfase1.nl URL).",
+        "data": {
+          "extra_regions": "Extra regions",
+          "scan_interval": "Scan interval",
+          "max_calls": "Max messages kept (for the map card)",
+          "max_age_minutes": "Max message age (0 = no limit)"
+        }
+      },
+      "sensors": {
+        "title": "Attributes for {instance_name}",
+        "description": "Select which fields of the latest message are exposed as attributes.",
+        "data": {
+          "priority_code": "Title (state)",
+          "title": "Title",
+          "message": "Message text",
+          "time": "Time",
+          "date": "Date",
+          "city": "City",
+          "address": "Address/Street",
+          "postalcode": "Postal code",
+          "capcode": "Capcode (no longer published by the site)",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "service_type": "Service type",
+          "raw_time_str": "Raw time string",
+          "absolute_time_str": "ISO timestamp",
+          "region": "Region path",
+          "url": "Link to message",
+          "priority": "Priority (A1/P1/…)",
+          "region_name": "Region name"
+        }
+      },
+      "filters": {
+        "title": "Service filters for {instance_name}",
+        "description": "Choose which services to show. Hidden services are also removed from the map card list.",
+        "data": {
+          "filter_ambulance": "Ambulance",
+          "filter_fire": "Fire department",
+          "filter_police": "Police",
+          "filter_other": "Other (KNRM, trauma heli, …)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to alarmfase1.nl.",
+      "invalid_region_path": "Region path not found on alarmfase1.nl (404). Use e.g. `limburg-zuid/kerkrade` or `brabant-noord`.",
+      "parse_error": "Failed to parse data from alarmfase1.nl. The website structure may have changed.",
+      "unknown_api_error": "An unknown error occurred while fetching data.",
+      "unknown": "An unexpected error occurred.",
+      "interval_too_short": "Scan interval must be at least 30 seconds."
+    }
+  },
+  "services": {
+    "manual_refresh": {
+      "name": "Manual refresh",
+      "description": "Immediately scrape alarmfase1.nl for all configured P2000 regions."
+    },
+    "clear_cache": {
+      "name": "Clear cache",
+      "description": "Remove the persistent cache of the last known P2000 messages."
+    },
+    "clear_debug_file": {
+      "name": "Clear debug file",
+      "description": "Delete the legacy p2000_debug.txt file if it still exists."
+    }
+  }
+}

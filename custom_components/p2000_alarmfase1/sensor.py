@@ -28,6 +28,23 @@ from .entity import Alarmfase1BaseEntity
 
 _LOGGER = logging.getLogger(__name__)
 
+CALL_ATTR_KEYS = (
+    "title",
+    "message",
+    "priority",
+    "service_type",
+    "time",
+    "date",
+    "absolute_time_str",
+    "city",
+    "address",
+    "latitude",
+    "longitude",
+    "region",
+    "region_name",
+    "url",
+)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -38,7 +55,7 @@ async def async_setup_entry(
     coordinator: Alarmfase1DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     # Create the main sensor representing the latest message
-    entities = [P2000Sensor(coordinator)]
+    entities = [P2000Sensor(coordinator), P2000CountSensor(coordinator)]
 
     # Add diagnostic sensors
     entities.extend(
@@ -107,6 +124,13 @@ class P2000Sensor(Alarmfase1BaseEntity, SensorEntity):
                 else:
                     attributes[key] = value
 
+        calls = [
+            {k: c.get(k) for k in CALL_ATTR_KEYS}
+            for c in (self.coordinator.data or {}).get("calls", [])
+            if self._matches_filters(c)
+        ]
+        attributes["calls"] = calls
+        attributes["regions"] = (self.coordinator.data or {}).get("regions", [])
         attributes["matches_filter"] = self._message_matches_filter
         attributes["last_update_attempt"] = dt_util.now()
 
@@ -220,3 +244,34 @@ class P2000DiagnosticSensor(Alarmfase1BaseEntity, SensorEntity):
     def available(self) -> bool:
         """Diagnostics are always available if the coordinator exists."""
         return self.coordinator is not None
+
+
+class P2000CountSensor(Alarmfase1BaseEntity, SensorEntity):
+    """Number of (filtered) recent calls across all configured regions."""
+
+    _attr_has_entity_name = False
+    _attr_icon = "mdi:counter"
+    _attr_native_unit_of_measurement = "meldingen"
+
+    def __init__(self, coordinator: Alarmfase1DataUpdateCoordinator) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{coordinator.config_entry.entry_id}_recent_count"
+        self._attr_name = (
+            f"{coordinator.config_entry.data[CONF_INSTANCE_NAME]} Meldingen"
+        )
+
+    @property
+    def native_value(self) -> StateType:
+        calls = (self.coordinator.data or {}).get("calls", [])
+        counts: dict[str, int] = {}
+        for c in calls:
+            counts[c.get("service_type") or "Other"] = (
+                counts.get(c.get("service_type") or "Other", 0) + 1
+            )
+        self._counts = counts
+        return len(calls)
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        self.native_value  # noqa: B018 - refresh counts
+        return {"per_service": getattr(self, "_counts", {})}

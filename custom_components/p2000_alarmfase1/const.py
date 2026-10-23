@@ -22,6 +22,27 @@ CONF_FILTER_POLICE: Final = "filter_police"
 CONF_FILTER_OTHER: Final = "filter_other"  # KNRM, Traumaheli, etc.
 
 CONF_SCAN_INTERVAL: Final = "scan_interval"
+CONF_EXTRA_REGIONS: Final = "extra_regions"
+CONF_MAX_CALLS: Final = "max_calls"
+CONF_MAX_AGE: Final = "max_age_minutes"
+
+DEFAULT_MAX_CALLS: Final = 25
+DEFAULT_MAX_AGE: Final = 180  # minutes, 0 = no limit
+
+# Normalised service types (site uses Dutch values in the `service` attribute)
+SERVICE_AMBULANCE: Final = "Ambulance"
+SERVICE_FIRE: Final = "Fire Department"
+SERVICE_POLICE: Final = "Police"
+SERVICE_HELI: Final = "Trauma Heli"
+SERVICE_KNRM: Final = "KNRM / Water Rescue"
+SERVICE_NAME_MAP: Final[dict[str, str]] = {
+    "ambulance": SERVICE_AMBULANCE,
+    "brandweer": SERVICE_FIRE,
+    "politie": SERVICE_POLICE,
+    "knrm": SERVICE_KNRM,
+    "traumaheli": SERVICE_HELI,
+    "lifeliner": SERVICE_HELI,
+}
 
 DEFAULT_SCAN_INTERVAL: Final = 120  # seconds
 MIN_SCAN_INTERVAL: Final = 30  # seconds
@@ -50,6 +71,10 @@ SCRAPED_DATA_KEYS: Final[list[str]] = [
     "service_type",
     "raw_time_str",
     "absolute_time_str",
+    "region",
+    "url",
+    "priority",
+    "region_name",
 ]
 
 # Default sensor selection (enabled by default)
@@ -66,6 +91,10 @@ DEFAULT_ENABLED_SENSORS: Final[list[str]] = [
     "service_type",
     "latitude",
     "longitude",
+    "priority",
+    "region",
+    "region_name",
+    "url",
 ]
 
 # Sensor configuration schema used in config flow options

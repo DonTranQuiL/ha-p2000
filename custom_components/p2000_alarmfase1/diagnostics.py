@@ -33,11 +33,10 @@ async def async_get_config_entry_diagnostics(
         DIAG_OPTIONS: dict(entry.options),
         DIAG_COORDINATOR_DATA: {
             "region_path": coordinator.region_path,
+            "regions": coordinator.regions,
             "last_update_success": coordinator.last_update_success,
             "last_update_error": coordinator.last_update_error,
-            "last_update_timestamp": coordinator.last_update_success_timestamp.isoformat()
-            if coordinator.last_update_success_timestamp
-            else None,
+            "last_update_timestamp": coordinator.last_update_success_timestamp,
             "update_interval": coordinator.update_interval.total_seconds()
             if coordinator.update_interval
             else None,
