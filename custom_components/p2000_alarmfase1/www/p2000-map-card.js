@@ -1,8 +1,8 @@
 /* P2000 Map Card - bundled with the p2000_alarmfase1 integration (auto-registered). */
-const P2000_VERSION = "2.1.0";
+const P2000_VERSION = "2.1.1";
 const BASE = "/p2000_alarmfase1";
-const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+const LEAFLET_JS = `${BASE}/leaflet.js?v=1.9.4`;
+const LEAFLET_CSS = `${BASE}/leaflet.css?v=1.9.4`;
 const SERVICES = {
   "Ambulance": { img: "ambulance.webp", color: "#f4c20d", label: "Ambulance" },
   "Fire Department": { img: "fire.webp", color: "#e53935", label: "Brandweer" },
@@ -48,6 +48,8 @@ class P2000MapCard extends HTMLElement {
         .hdr img{width:28px;height:28px;border-radius:7px}
         .hdr .cnt{margin-left:auto;font-size:.8em;opacity:.7}
         #map{width:100%;z-index:0}
+        #map.dark .leaflet-tile-pane{filter:invert(.9) hue-rotate(180deg) brightness(.95) contrast(.9)}
+        #map.dark{background:#1c1c1c}
         .mk{position:relative;width:46px;height:46px}
         .mk .ph{position:absolute;inset:3px;border-radius:50%;background:#fff center/cover no-repeat;border:3px solid var(--c);box-shadow:0 3px 8px rgba(0,0,0,.45);z-index:2}
         .mk .ring{position:absolute;inset:0;border-radius:50%;border:3px solid var(--c);animation:pulse 1.8s ease-out infinite;z-index:1}
@@ -89,6 +91,34 @@ class P2000MapCard extends HTMLElement {
     this._calls = calls.slice(0, this._config.max_markers);
     this._render();
   }
+  async _token() {
+    try {
+      const r = await this._hass.connection.sendMessagePromise({ type: "map_tiles/access_token" });
+      return r && r.token;
+    } catch (e) { return undefined; }
+  }
+  async _createTileLayer(L) {
+    const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+    const token = await this._token();
+    if (!token) {
+      return L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        { maxZoom: 20, maxNativeZoom: 19, attribution, referrerPolicy: "origin" });
+    }
+    const origin = (this._hass.auth?.data?.hassUrl || location.origin).replace(/\/+$/, "");
+    const layer = L.tileLayer(`${origin}/api/map_tiles/raster/{z}/{x}/{y}.png?token={token}`,
+      { maxZoom: 20, maxNativeZoom: 19, attribution, token });
+    const refresh = async () => {
+      const t = await this._token();
+      if (t && t !== layer.options.token) { layer.options.token = t; layer.redraw(); }
+    };
+    let last = 0;
+    layer.on("tileerror", () => { if (Date.now() - last > 30000) { last = Date.now(); refresh(); } });
+    clearInterval(this._tokenTimer);
+    this._tokenTimer = setInterval(refresh, 20 * 60 * 1000);
+    return layer;
+  }
+  disconnectedCallback() { clearInterval(this._tokenTimer); this._tokenTimer = null; }
+  connectedCallback() { if (this._tiles && !this._tokenTimer && this._tiles.options.token) this._tokenTimer = setInterval(async () => { const t = await this._token(); if (t) { this._tiles.options.token = t; this._tiles.redraw(); } }, 20 * 60 * 1000); }
   async _render() {
     const r = this.shadowRoot, cfg = this._config;
     r.querySelector(".ttl").textContent = cfg.title || "P2000 meldingen";
@@ -99,9 +129,13 @@ class P2000MapCard extends HTMLElement {
     if (!this._map) {
       const home = [this._hass.config.latitude || 52.1, this._hass.config.longitude || 5.3];
       this._map = L.map(el, { zoomControl: true, attributionControl: true }).setView(home, cfg.zoom);
-      const dark = cfg.dark === true || (cfg.dark === "auto" && this._hass.themes?.darkMode);
-      L.tileLayer(dark ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        { maxZoom: 19, attribution: "&copy; OpenStreetMap" + (dark ? " &copy; CARTO" : "") }).addTo(this._map);
+      const dark = cfg.dark === true || (cfg.dark === "auto" && !!this._hass.themes?.darkMode);
+      // Same tiles as HA's built-in map: core's /api/map_tiles proxy (OSM raster,
+      // short-lived token from the websocket - no API key). Older HA without the
+      // proxy falls back to OpenStreetMap directly. Dark = inverted, like ha-map.
+      this._tiles = await this._createTileLayer(L);
+      this._tiles.addTo(this._map);
+      if (dark) el.classList.add("dark");
       this._layer = L.layerGroup().addTo(this._map);
       new ResizeObserver(() => this._map.invalidateSize()).observe(el);
     }

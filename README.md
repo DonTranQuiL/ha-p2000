@@ -191,7 +191,7 @@ fade_minutes: 60                   # optional, older markers fade out
 dark: auto                         # auto | true | false
 ```
 
-Newest calls drop in with a flashing blue/red ring; every marker shows a photo of the service (ambulance, brandweer, politie, traumaheli). Click a marker or list item for details and a link to alarmfase1.nl. Map tiles: OpenStreetMap / CARTO, Leaflet loaded from unpkg.
+Newest calls drop in with a flashing blue/red ring; every marker shows a photo of the service (ambulance, brandweer, politie, traumaheli). Click a marker or list item for details and a link to alarmfase1.nl. Map tiles: the same ones as Home Assistant's built-in map (core's keyless `/api/map_tiles` proxy, OpenStreetMap fallback on older HA). Leaflet is bundled — no API key, no CDN.
 
 ## 🎨 Recommended Dashboard (Mushroom)
 
