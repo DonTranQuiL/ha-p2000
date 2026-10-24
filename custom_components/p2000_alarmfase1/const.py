@@ -27,7 +27,9 @@ CONF_MAX_CALLS: Final = "max_calls"
 CONF_MAX_AGE: Final = "max_age_minutes"
 
 DEFAULT_MAX_CALLS: Final = 25
-DEFAULT_MAX_AGE: Final = 180  # minutes, 0 = no limit
+DEFAULT_MAX_AGE: Final = 1440  # minutes, 0 = no limit
+CONF_HISTORY_SIZE: Final = "history_size"
+DEFAULT_HISTORY_SIZE: Final = 10
 
 # Normalised service types (site uses Dutch values in the `service` attribute)
 SERVICE_AMBULANCE: Final = "Ambulance"

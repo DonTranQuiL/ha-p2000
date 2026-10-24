@@ -22,12 +22,14 @@ from .api import (
 from .const import (
     CONF_EXTRA_REGIONS,
     CONF_FILTERS,
+    CONF_HISTORY_SIZE,
     CONF_INSTANCE_NAME,
     CONF_MAX_AGE,
     CONF_MAX_CALLS,
     CONF_REGION_PATH,
     CONF_SCAN_INTERVAL,
     CONF_SENSORS,
+    DEFAULT_HISTORY_SIZE,
     DEFAULT_MAX_AGE,
     DEFAULT_MAX_CALLS,
     DEFAULT_SCAN_INTERVAL,
@@ -154,6 +156,9 @@ class P2000OptionsFlowHandler(config_entries.OptionsFlow):
                 self._options[CONF_MAX_AGE] = int(
                     user_input.get(CONF_MAX_AGE, DEFAULT_MAX_AGE)
                 )
+                self._options[CONF_HISTORY_SIZE] = int(
+                    user_input.get(CONF_HISTORY_SIZE, DEFAULT_HISTORY_SIZE)
+                )
                 return await self.async_step_sensors()
 
         o = self._options
@@ -179,6 +184,14 @@ class P2000OptionsFlowHandler(config_entries.OptionsFlow):
                 ): selector.NumberSelector(
                     selector.NumberSelectorConfig(
                         min=1, max=100, mode=selector.NumberSelectorMode.BOX
+                    )
+                ),
+                vol.Required(
+                    CONF_HISTORY_SIZE,
+                    default=o.get(CONF_HISTORY_SIZE, DEFAULT_HISTORY_SIZE),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=1, max=50, mode=selector.NumberSelectorMode.BOX
                     )
                 ),
                 vol.Required(

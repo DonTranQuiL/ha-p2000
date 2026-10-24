@@ -30,8 +30,9 @@
         "data": {
           "extra_regions": "Extra regions",
           "scan_interval": "Scan interval",
-          "max_calls": "Max messages kept (for the map card)",
-          "max_age_minutes": "Max message age (0 = no limit)"
+          "max_calls": "Max messages read per update",
+          "max_age_minutes": "Max message age (0 = no limit)",
+          "history_size": "History size (messages remembered, also after restart)"
         }
       },
       "sensors": {

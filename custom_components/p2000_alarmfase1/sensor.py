@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.util import dt as dt_util
+from homeassistant.util import slugify
 
 from .const import (
     CONF_FILTER_AMBULANCE,
@@ -40,6 +41,8 @@ CALL_ATTR_KEYS = (
     "address",
     "latitude",
     "longitude",
+    "approx",
+    "location_source",
     "region",
     "region_name",
     "url",
@@ -84,6 +87,9 @@ class P2000Sensor(Alarmfase1BaseEntity, SensorEntity):
         self._attr_unique_id = (
             f"{coordinator.config_entry.data[CONF_INSTANCE_NAME]}_latest_message"
         )
+        self.entity_id = "sensor.p2000_" + slugify(
+            coordinator.config_entry.data[CONF_INSTANCE_NAME]
+        ).removeprefix("p2000_")
         self._previous_data: dict | None = None
         self._message_matches_filter = True
 

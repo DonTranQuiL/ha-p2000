@@ -11,16 +11,19 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.storage import Store
 from homeassistant.helpers.typing import ConfigType
 
 from .api import Alarmfase1ApiClient
 from .cache import PersistentCache
 from .const import (
     CONF_EXTRA_REGIONS,
+    CONF_HISTORY_SIZE,
     CONF_MAX_AGE,
     CONF_MAX_CALLS,
     CONF_REGION_PATH,
     CONF_SCAN_INTERVAL,
+    DEFAULT_HISTORY_SIZE,
     DEFAULT_MAX_AGE,
     DEFAULT_MAX_CALLS,
     DEFAULT_SCAN_INTERVAL,
@@ -28,13 +31,14 @@ from .const import (
     PLATFORMS,
 )
 from .coordinator import Alarmfase1DataUpdateCoordinator
+from .geocode import Geocoder
 
 _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 CARD_URL_BASE = f"/{DOMAIN}"
 CARD_FILE = "p2000-map-card.js"
-CARD_VERSION = "2.1.1"
+CARD_VERSION = "2.1.10"
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
@@ -79,6 +83,16 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     return True
 
 
+def _geocoder(hass: HomeAssistant) -> Geocoder:
+    """One shared, rate-limited Nominatim geocoder with a persistent cache."""
+    data = hass.data.setdefault(DOMAIN, {})
+    if "_geocoder" not in data:
+        data["_geocoder"] = Geocoder(
+            async_get_clientsession(hass), Store(hass, 1, f"{DOMAIN}_geocode_cache")
+        )
+    return data["_geocoder"]
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up P2000 Scraper from a config entry."""
     hass.data.setdefault(DOMAIN, {})
@@ -99,7 +113,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         extra_regions=opts.get(CONF_EXTRA_REGIONS, []),
         max_calls=int(opts.get(CONF_MAX_CALLS, DEFAULT_MAX_CALLS)),
         max_age_minutes=int(opts.get(CONF_MAX_AGE, DEFAULT_MAX_AGE)),
+        history_size=int(opts.get(CONF_HISTORY_SIZE, DEFAULT_HISTORY_SIZE)),
         config_entry=entry,
+        geocoder=_geocoder(hass),
     )
     coordinator.config_entry = entry
 

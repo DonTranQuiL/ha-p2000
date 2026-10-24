@@ -83,7 +83,7 @@ This custom integration for Home Assistant allows you to scrape emergency messag
 * ✅ **Blaxing fast startup and entity control**: Assistant reboots—no more "Unknown" states on startup.
 * ✅ **Latest live data**: Fetches the latest P2000 emergency messages from alarmfase1.nl.
 * ✅ **Multiple regions**: Add extra regions/towns to one instance via ⚙️ Configure (merged & de-duplicated), or add the integration multiple times.
-* ✅ **Bundled P2000 Map Card**: Animated Leaflet map with photo markers for ambulance, fire, police and trauma heli — auto-registered, no manual resource needed.
+* ✅ **Bundled P2000 Map Card**: Animated map on HA's built-in map with photo markers for ambulance, fire, police and trauma heli — auto-registered, no manual resource needed.
 * ✅ **Recent calls list**: `calls` attribute with the latest messages (incl. coordinates, priority, link) plus a `Meldingen` count sensor.
 * ✅ **Filter**: Filter messages by service type (Ambulance, Fire Department, Police, Other) via the Options flow.
 * ✅ **Coordinates**: Includes coordinates (latitude and longitude) for displaying incidents on a map.
@@ -134,7 +134,7 @@ Once installed via HACS and after restarting Home Assistant, you can add your de
 2.  **Add Integration:** Click the "+ Add Integration" button (usually in the bottom right).
 3.  **Search:** Search for "P2000 Alarmfase1" and click on it.
 4.  **Enter Region Path:** You will be prompted to enter the **Region Path** for your area. You can find this on the [alarmfase1.nl](https://www.alarmfase1.nl/) website (e.g., `limburg-zuid/maastricht/`).
-5.  **Enter Instance Name:** You will also be asked to provide an **Instance Name** (e.g., `maastricht`). This name will be used in the entity IDs (e.g., `sensor.p2000_alarmfase1_maastricht_latest_message`). Click Submit.
+5.  **Enter Instance Name:** You will also be asked to provide an **Instance Name** (e.g., `maastricht`). This name will be used in the entity IDs (e.g., `sensor.p2000_maastricht`). Click Submit.
 6.  **Done!** The integration will be set up for that region, and sensor entities will be created.
 7.  **Add More Regions:** To monitor another region, simply repeat steps 2-6.
 
@@ -151,7 +151,7 @@ You can change the scan interval, enabled sensors, and filters after setup:
 
 This integration creates the following entities for each configured region (instance):
 
-* **`sensor.p2000_alarmfase1_<instance_name>_latest_message`**: This sensor provides the priority code of the latest matching emergency message. Its attributes contain detailed information:
+* **`sensor.p2000_<instance_name>`**: This sensor provides the priority code of the latest matching emergency message. Its attributes contain detailed information:
     * `priority_code`
     * `date` (of the message)
     * `time` (of the message)
@@ -178,179 +178,47 @@ The main sensor provides `latitude` and `longitude` attributes, allowing you to 
 
 ## 🗺️ P2000 Map Card (bundled)
 
-Since v2.1.0 the integration ships its own card and registers it automatically (refresh your browser once after updating).
+<p align="center"><img src="docs/map-card-demo.gif" alt="P2000 map card demo" width="700"></p>
+
+The integration ships its own animated map card and **registers it automatically** — no manual dashboard resource, no copying JS to `www/`, no `?v=` resource URL. Just install via HACS, restart Home Assistant and add `type: custom:p2000-map-card` to a dashboard.
+
+> If you previously added a manual resource for `p2000-map-card.js` (Settings → Dashboards → Resources), remove it. Hard-refresh your browser (Ctrl+F5) after every update. It runs on Home Assistant's **built-in map** (`ha-map`, same tiles as the HA map) — no API key, no CDN, no extra resource.
 
 ```yaml
 type: custom:p2000-map-card
-entity: sensor.p2000_kerkrade      # or entities: [sensor.a, sensor.b]
+entity: sensor.p2000_kerkrade      # or entities: [sensor.p2000_a, sensor.p2000_b]
 title: P2000 meldingen             # optional
-height: 400                        # optional
-show_list: true                    # optional, list of latest calls under the map
-list_size: 6                       # optional
-fade_minutes: 60                   # optional, older markers fade out
+height: 400                        # map height in px (default 400)
+zoom: 11                           # initial zoom (default 11), map auto-fits to markers
+show_list: true                    # list of latest calls under the map (default true)
+list_size: 6                       # items in the list (default 6)
+max_markers: 50                    # max markers on the map (default 50)
+fade_minutes: 60                   # markers older than this get a calmer look (default 60)
 dark: auto                         # auto | true | false
 ```
 
-Newest calls drop in with a flashing blue/red ring; every marker shows a photo of the service (ambulance, brandweer, politie, traumaheli). Click a marker or list item for details and a link to alarmfase1.nl. Map tiles: the same ones as Home Assistant's built-in map (core's keyless `/api/map_tiles` proxy, OpenStreetMap fallback on older HA). Leaflet is bundled — no API key, no CDN.
+* Every marker shows a photo of the service (ambulance, brandweer, politie, traumaheli).
+* The newest call drops in with a flashing siren ring; older calls keep a softer, slower ping.
+* Click a marker or list item for details and a link to alarmfase1.nl.
+* The card shows the persistent history (last 10 calls by default) stored by the integration, so calls survive restarts.
 
-## 🎨 Recommended Dashboard (Mushroom)
+**Locations / geocoding:** a call is placed using its latitude/longitude; if missing, the street address is geocoded; if that is missing, the postal code. Calls with none of these are left off the map (they still appear in the sensor). Geocoding uses OpenStreetMap Nominatim server-side, rate limited (1 req/s) and cached persistently.
 
-To get the look seen in the screenshots, you will need **[Mushroom Cards](https://github.com/piitaya/lovelace-mushroom)** and **[Card Mod](https://github.com/thomasloven/lovelace-card-mod)** (both available in HACS). 
-
-*Note: Replace `yourplace` in the entity IDs below with your actual instance name.*
-
-```yaml
-type: custom:mushroom-legacy-template-card
-entity: sensor.p2000_alarmfase1_yourplace_latest_message
-fill_container: true
-multiline_secondary: true
-primary: "{{ states('sensor.p2000_alarmfase1_yourplace_latest_message') }}"
-secondary: |
-  📅 {{ state_attr(entity, 'date') }} | 🕒 {{ state_attr(entity, 'time') }}
-  📍 {{ state_attr(entity, 'address') }}, {{ state_attr(entity, 'postalcode') }}
-  💬 {{ state_attr(entity, 'message') }}
-icon: >-
-  {%- if 'Ambulance' in state_attr(entity, 'service_type') -%} mdi:ambulance {%-
-  elif 'Politie' in state_attr(entity, 'service_type') -%} mdi:police-badge {%-
-  elif 'Brandweer' in state_attr(entity, 'service_type') -%} mdi:fire-truck {%-
-  elif 'Trauma' in state_attr(entity, 'service_type') -%} mdi:helicopter {%-
-  else -%} mdi:alert-decagram {%- endif -%}
-icon_color: >-
-  {%- if 'Ambulance' in state_attr(entity, 'service_type') -%} yellow {%- elif
-  'Politie' in state_attr(entity, 'service_type') -%} blue {%- elif 'Brandweer'
-  in state_attr(entity, 'service_type') -%} red {%- elif 'Trauma' in
-  state_attr(entity, 'service_type') -%} orange {%- else -%} grey {%- endif -%}
-tap_action:
-  action: url
-  url_path: >-
-    {% set lat = state_attr(entity, 'latitude') %} {% set lon =
-    state_attr(entity, 'longitude') %} {% if lat and lon %}
-    https://www.google.com/maps/search/?api=1&query={{ lat }},{{ lon }} {% else
-    %} # {% endif %}
-card_mod:
-  style:
-    mushroom-shape-icon$: |
-      .shape {
-        position: relative;
-        overflow: visible !important;
-        
-        /* 1. Define the dynamic color for the spray and fog */
-        {% if 'Ambulance' in state_attr(config.entity, 'service_type') %} --irrig-color: var(--rgb-yellow);
-        {% elif 'Politie' in state_attr(config.entity, 'service_type') %} --irrig-color: var(--rgb-blue);
-        {% elif 'Brandweer' in state_attr(config.entity, 'service_type') %} --irrig-color: var(--rgb-red);
-        {% else %} --irrig-color: var(--rgb-grey);
-        {% endif %}
-
-        /* 2. Trigger the animations if alert is active */
-        {% if '1' in states(config.entity) or 'Politie' in states(config.entity) %}
-          --shape-animation: irrig-ultra 2s ease-in-out infinite;
-          --irrig-heads-animation: irrig-heads 1.6s ease-out infinite;
-          --irrig-fog-animation: irrig-fog 2s ease-in-out infinite;
-          opacity: 1;
-        {% else %}
-          --shape-animation: none;
-          --irrig-heads-animation: none;
-          --irrig-fog-animation: none;
-          opacity: 0.75;
-        {% endif %}
-
-        /* 3. Apply the jumping animation to the shape itself */
-        animation: var(--shape-animation);
-      }
-
-      .shape::before,
-      .shape::after {
-        content: '';
-        position: absolute;
-        border-radius: inherit;
-        inset: 0;
-        pointer-events: none;
-      }
-
-      .shape::before {
-        animation: var(--irrig-heads-animation);
-      }
-
-      .shape::after {
-        animation: var(--irrig-fog-animation);
-      }
-
-      @keyframes irrig-ultra {
-        0%   { transform: translateY(0) scale(1); }
-        25%  { transform: translateY(-2px) scale(1.02); }
-        50%  { transform: translateY(-4px) scale(1.03); }
-        75%  { transform: translateY(-2px) scale(1.02); }
-        100% { transform: translateY(0) scale(1); }
-      }
-
-      @keyframes irrig-heads {
-        0% {
-          box-shadow:
-            -10px 10px 0 0 rgba(var(--irrig-color), 0),
-            0 10px 0 0 rgba(var(--irrig-color), 0),
-            10px 10px 0 0 rgba(var(--irrig-color), 0);
-        }
-        20% {
-          box-shadow:
-            -10px 4px 0 0 rgba(var(--irrig-color), 0.9),
-            0 10px 0 0 rgba(var(--irrig-color), 0),
-            10px 10px 0 0 rgba(var(--irrig-color), 0);
-        }
-        40% {
-          box-shadow:
-            -10px -2px 0 0 rgba(var(--irrig-color), 0.4),
-            0 4px 0 0 rgba(var(--irrig-color), 0.9),
-            10px 10px 0 0 rgba(var(--irrig-color), 0);
-        }
-        100% {
-          box-shadow:
-            -10px 10px 0 0 rgba(var(--irrig-color), 0),
-            0 10px 0 0 rgba(var(--irrig-color), 0),
-            10px 10px 0 0 rgba(var(--irrig-color), 0);
-        }
-      }
-
-      @keyframes irrig-fog {
-        50% {
-          filter: blur(0.7px);
-          box-shadow: 0 -14px 18px -8px rgba(var(--irrig-color), 0.45);
-        }
-      }
-    .: |
-      mushroom-shape-icon {
-          --icon-size: 65px;
-          display: flex;
-          margin: -55px 0 10px -20px !important;
-          padding-right: 10px;
-        }
-      ha-card {
-        clip-path: inset(0 0 0 0 round var(--ha-card-border-radius, 12px));
-        {% if '1' in states(config.entity) or 'Politie' in states(config.entity) %}
-          {% set s = state_attr(config.entity, 'service_type') %}
-          {% if 'Ambulance' in s %} background: rgba(var(--rgb-yellow), 0.1) !important;
-          {% elif 'Politie' in s %} background: rgba(var(--rgb-blue), 0.1) !important;
-          {% elif 'Brandweer' in s %} background: rgba(var(--rgb-red), 0.1) !important;
-          {% else %} background: rgba(var(--rgb-red), 0.1) !important;
-          {% endif %}
-        {% endif %}
-      }
-grid_options:
-  columns: 48
-  rows: 2
-
-```
-
-[hacs]: https://hacs.xyz
-[hacs_badge]: https://img.shields.io/badge/HACS-Custom
 ## Options
 
-The following options can be configured for each instance of the integration:
+Open **Settings → Devices & Services → P2000 Alarmfase1 → ⚙️ (Configure)**:
 
-* **Extra regions:** Additional region paths (e.g. `brabant-noord/gemert`, `drenthe` or a full alarmfase1.nl URL). Each one is validated before saving; the integration reloads automatically.
+<p align="center"><img src="docs/add-region-demo.gif" alt="Adding a region" width="700"></p>
+
+* **Extra regions:** Additional region paths (e.g. `brabant-noord/gemert`, `drenthe` or a full alarmfase1.nl URL). Each one is validated before saving. Extra regions are **merged into the same sensor** (one combined feed); add a new integration entry if you want a separate sensor.
 * **Scan Interval:** How often to check for new messages (in seconds, min 30).
-* **Max messages / max age:** How many recent calls are kept for the map card and how old they may be.
-* **Enabled Sensors:** Select which details from the scraped message should be included as attributes of the main sensor.
+* **Max calls:** How many recent calls the sensor exposes in its `calls` attribute (default 25).
+* **Max age:** Maximum age in minutes of calls fetched per update (default 1440, `0` = no limit). It does not trim the stored history.
+* **History size:** Number of calls kept persistently across restarts for the map card (1–50, default 10).
+* **Enabled Sensors:** Select which details from the scraped message are included as attributes.
 * **Filters:** Enable or disable filtering for specific service types (Ambulance, Fire Department, Police, Other).
+
+**Sensor naming:** each entry creates `sensor.p2000_<name>` (e.g. `sensor.p2000_amsterdam`). Existing entities keep their current entity ID; rename it under the entity settings or re-add the entry to get the new name.
 
 ## Troubleshooting
 
