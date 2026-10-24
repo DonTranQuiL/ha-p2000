@@ -106,25 +106,18 @@ This custom integration for Home Assistant allows you to scrape emergency messag
 
 ## Installation (Using HACS)
 
-This integration is best installed via HACS. If you have HACS installed, you can add this repository as a **Custom Repository**.
+**P2000 Alarmfase1** is submitted to the **HACS default list**, so you can install it straight from the HACS store:
 
-1.  **Navigate to HACS:** Open Home Assistant and go to HACS in the sidebar.
-2.  **Go to Integrations:** Click on "Integrations".
-3.  **Add Custom Repository:** Click the three vertical dots (⋮) in the top-right corner and select "Custom repositories".
-4.  **Enter Repository Details:**
-    * In the "Repository" field, paste the URL of this GitHub repository:
-      ```
-      https://github.com/malosaaa/ha-p2000
-      ```
-    * In the "Category" dropdown, select **"Integration"**.
-    * Click the "Add" button.
-5.  **Install Integration:**
-    * Close the "Custom repositories" dialog.
-    * The "P2000 Alarmfase1" integration should now appear in your HACS Integrations list. Find it or search for it.
-    * Click on the integration card.
-    * Click the "Download" button (usually in the bottom right).
-    * Confirm the download (select the version - usually the latest is recommended).
-6.  **Restart Home Assistant:** After HACS finishes downloading, **you MUST restart Home Assistant** for the integration to be loaded. A prompt should appear, or you can do it manually via Developer Tools -> Server Management -> Restart.
+1. Open **HACS** in your sidebar and search for **P2000 Alarmfase1**.
+2. Open it and click **Download**.
+3. **Restart Home Assistant.**
+
+<details>
+<summary>Fallback: add as a custom repository</summary>
+
+If P2000 Alarmfase1 does not show up in the HACS search (yet), click the three dots (⋮) in the top right of HACS → **Custom repositories**, paste `https://github.com/DonTranQuiL/ha-p2000` with category **Integration**, click **Add**, then continue with step 2.
+
+</details>
 
 ## Configuration
 
@@ -222,7 +215,7 @@ Open **Settings → Devices & Services → P2000 Alarmfase1 → ⚙️ (Configur
 
 ## Troubleshooting
 
-* **Integration not found in HACS:** Ensure you have added your repository as a custom repository in HACS settings and restarted Home Assistant after installation.
+* **Integration not found in HACS:** Make sure HACS is up to date (or add the repository as a custom repository, see the fallback above) and restart Home Assistant after installation.
 * **"Config flow could not be loaded":** Double-check the installation steps and restart Home Assistant. Review your Home Assistant logs for detailed error messages.
 * **No entities created after configuration:** Check your Home Assistant logs for any errors related to the `p2000_alarmfase1` integration. Ensure the region path you entered is correct.
 * **Sensor shows "Unavailable":** This might happen briefly after a restart. If it persists, check the diagnostic sensors and your Home Assistant logs for any update errors.
