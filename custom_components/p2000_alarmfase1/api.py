@@ -119,7 +119,9 @@ def parse_calls(html: str, region_path: str = "") -> list[dict]:
         href = link["href"] if link else None
         if href and href.startswith("/"):
             href = BASE_URL.rstrip("/") + href
-        data["url"] = href
+        if href and not re.match(r"^https?://", href.strip(), re.IGNORECASE):
+            href = None
+        data["url"] = href.strip() if href else None
         data["capcode"] = None  # not published by alarmfase1.nl anymore
         data["service_type"] = normalize_service(div.get("service"), title)
         calls.append(data)

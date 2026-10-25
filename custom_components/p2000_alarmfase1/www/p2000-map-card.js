@@ -32,6 +32,7 @@ const MARKER_CSS = `
 `;
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+const safeUrl = (u) => { const t = typeof u === "string" ? u.trim() : ""; return /^https?:\/\//i.test(t) ? t : ""; };
 class P2000MapCard extends HTMLElement {
   static getStubConfig(hass) {
     const e = Object.keys(hass.states).find((k) => k.startsWith("sensor.") && hass.states[k].attributes.calls);
@@ -152,7 +153,7 @@ class P2000MapCard extends HTMLElement {
     const w = document.createElement("div"); w.className = "popwrap"; w.style.setProperty("--c", s.color);
     w.innerHTML = `<button class="x" aria-label="close">×</button><div class="pop"><img src="${BASE}/${s.img}"><div><b>${esc(c.title)}</b>
         <small>${esc(c.date)} ${esc(c.time)} · ${esc(c.priority || s.label)}</small><br><small>${c.approx ? "~ " : ""}${esc(c.address)} ${esc(c.city)}${c.latitude == null ? " · geen locatie" : c.approx ? (c.location_source === "postcode" ? " · locatie via postcode" : " · locatie via adres") : ""}</small>
-        ${c.url ? `<br><a href="${esc(c.url)}" target="_blank" rel="noopener">alarmfase1.nl ↗</a>` : ""}</div></div>`;
+        ${safeUrl(c.url) ? `<br><a href="${esc(safeUrl(c.url))}" target="_blank" rel="noopener">alarmfase1.nl ↗</a>` : ""}</div></div>`;
     w.querySelector(".x").onclick = (e) => { e.stopPropagation(); this._closePopup(); };
     this.shadowRoot.getElementById("map").appendChild(w);
   }

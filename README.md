@@ -222,7 +222,7 @@ Open **Settings → Devices & Services → P2000 Alarmfase1 → ⚙️ (Configur
 * **Map icons not showing:** Ensure the main sensor has valid `latitude` and `longitude` attributes and that the `service_type` is being correctly identified in the attributes.
 
 If you encounter issues, please check the existing issues on GitHub first, and if your problem isn't listed, feel free to open a new issue here:
-[https://github.com/malosaaa/ha-p2000/issues](https://github.com/malosaaa/ha-p2000/issues) 
+[https://github.com/DonTranQuiL/ha-p2000/issues](https://github.com/DonTranQuiL/ha-p2000/issues) 
 
 ## Contributing
 
@@ -230,7 +230,7 @@ Contributions are welcome! Please feel free to submit issues or pull requests to
 
 ## License
 
-This project is licensed under the [Apache License 2.0](LICENSE).  
+This project is licensed under the [MIT License](LICENSE).  
 
 ## Disclaimer
 
