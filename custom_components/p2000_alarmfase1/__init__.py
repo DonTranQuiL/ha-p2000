@@ -38,7 +38,7 @@ _LOGGER = logging.getLogger(__name__)
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 CARD_URL_BASE = f"/{DOMAIN}"
 CARD_FILE = "p2000-map-card.js"
-CARD_VERSION = "2.1.11"
+CARD_VERSION = "2.1.12"
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
