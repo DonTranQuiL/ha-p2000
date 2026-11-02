@@ -126,3 +126,26 @@ async def test_user_flow(hass):
         )
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_REGION_PATH] == "limburg-zuid/kerkrade"
+
+
+async def test_scrape_calls_parses_in_executor(hass):
+    """parse_calls runs via hass.async_add_executor_job, off the event loop."""
+    from unittest.mock import MagicMock
+
+    from custom_components.p2000_alarmfase1.api import Alarmfase1ApiClient
+
+    response = MagicMock(status=200)
+    response.raise_for_status = MagicMock()
+    response.text = AsyncMock(return_value=HTML)
+    session = MagicMock()
+    session.get = AsyncMock(return_value=response)
+
+    client = Alarmfase1ApiClient(session, hass)
+    with patch.object(
+        hass, "async_add_executor_job", wraps=hass.async_add_executor_job
+    ) as executor:
+        calls = await client.async_scrape_calls("limburg-zuid/kerkrade")
+
+    executor.assert_called_once()
+    assert executor.call_args.args[0] is parse_calls
+    assert calls == parse_calls(HTML, "limburg-zuid/kerkrade")

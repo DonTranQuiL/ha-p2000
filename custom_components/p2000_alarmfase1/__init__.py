@@ -103,7 +103,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = Alarmfase1DataUpdateCoordinator(
         hass=hass,
         name=f"P2000 Coordinator {entry.title}",
-        client=Alarmfase1ApiClient(async_get_clientsession(hass)),
+        client=Alarmfase1ApiClient(async_get_clientsession(hass), hass),
         region_path=entry.data[CONF_REGION_PATH],
         update_interval=timedelta(
             seconds=opts.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)

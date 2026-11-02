@@ -9,6 +9,7 @@ from datetime import datetime
 
 from aiohttp import ClientError, ClientSession
 from bs4 import BeautifulSoup
+from homeassistant.core import HomeAssistant
 
 from .const import (
     API_TIMEOUT,
@@ -131,8 +132,11 @@ def parse_calls(html: str, region_path: str = "") -> list[dict]:
 class Alarmfase1ApiClient:
     """Scraper API Client."""
 
-    def __init__(self, session: ClientSession) -> None:
+    def __init__(
+        self, session: ClientSession, hass: HomeAssistant | None = None
+    ) -> None:
         self._session = session
+        self._hass = hass
 
     async def async_scrape_calls(self, region_path: str) -> list[dict]:
         """Return all calls on a region page (newest first)."""
@@ -151,6 +155,11 @@ class Alarmfase1ApiClient:
         except (ClientError, TimeoutError) as exc:
             raise ScraperApiConnectionError(f"Connection error with {url}") from exc
         try:
+            if self._hass is not None:
+                # BeautifulSoup parsing is CPU-bound; keep it off the event loop.
+                return await self._hass.async_add_executor_job(
+                    parse_calls, html, region_path
+                )
             return parse_calls(html, region_path)
         except Exception as exc:
             raise ScraperApiParsingError(f"Failed to parse HTML from {url}") from exc

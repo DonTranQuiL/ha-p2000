@@ -51,7 +51,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 
 async def validate_input(hass, region_path: str) -> None:
     """Validate that the region page can be fetched and parsed."""
-    client = Alarmfase1ApiClient(async_get_clientsession(hass))
+    client = Alarmfase1ApiClient(async_get_clientsession(hass), hass)
     await client.async_scrape_calls(region_path)
 
 
