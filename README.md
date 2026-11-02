@@ -40,7 +40,7 @@
 
   <!-- Ecosystem -->
   <a href="https://hacs.xyz/">
-    <img src="https://img.shields.io/badge/HACS-CUSTOM-ff6e27?style=for-the-badge" alt="HACS">
+    <img src="https://img.shields.io/badge/HACS-DEFAULT-41BDF5?style=for-the-badge" alt="HACS">
   </a>
   <a href="https://www.home-assistant.io/">
     <img src="https://img.shields.io/badge/Home%20Assistant-2024.5%2B-007ec6?style=for-the-badge" alt="Home Assistant">
@@ -106,7 +106,7 @@ This custom integration for Home Assistant allows you to scrape emergency messag
 
 ## Installation (Using HACS)
 
-**P2000 Alarmfase1** is submitted to the **HACS default list**, so you can install it straight from the HACS store:
+**P2000 Alarmfase1** is in the **HACS default list**, so you can install it straight from the HACS store:
 
 1. Open **HACS** in your sidebar and search for **P2000 Alarmfase1**.
 2. Open it and click **Download**.
@@ -244,5 +244,5 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 [hacs]: https://hacs.xyz
-[hacs_badge]: https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge
+[hacs_badge]: https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge
 [maintenance_badge]: https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge
