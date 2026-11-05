@@ -102,9 +102,18 @@ This custom integration for Home Assistant allows you to scrape emergency messag
 ## Prerequisites
 
 * Home Assistant instance.
-* [HACS (Home Assistant Community Store)](https://hacs.xyz/) installed.
+* Home Assistant 2026.11 or newer (built-in Marketplace), or [HACS (Home Assistant Community Store)](https://hacs.xyz/) on older versions.
 
-## Installation (Using HACS)
+## Installation
+
+### Marketplace (Home Assistant 2026.11 and newer, recommended)
+
+[![Open your Home Assistant instance and open this repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=DonTranQuiL&repository=ha-p2000&category=integration)
+
+1. In Home Assistant, go to **Settings > Marketplace** and search for **P2000 Alarmfase1** (or use the button above).
+2. Open it and select **Install**. The setup starts right away, no restart needed.
+
+### HACS (Home Assistant before 2026.11)
 
 **P2000 Alarmfase1** is in the **HACS default list**, so you can install it straight from the HACS store:
 
