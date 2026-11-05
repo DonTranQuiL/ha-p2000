@@ -4,6 +4,11 @@
   "after_dependencies": [
     "frontend"
   ],
+  "categories": [
+    "weather_alerts.public_warnings",
+    "security_safety",
+    "local_services"
+  ],
   "codeowners": [
     "@malosaaa"
   ],
